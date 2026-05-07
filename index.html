@@ -123,6 +123,28 @@
       gap: 10px;
     }
 
+    .mode-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .disabled-explanations {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .disabled-note {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
     button {
       height: 46px;
       border: 1px solid #cbd5e1;
@@ -284,8 +306,16 @@
 
     <section class="card">
       <div class="form-grid">
+        <div class="field full">
+          <label>Calculator Mode</label>
+          <div class="mode-buttons">
+            <button id="reverseModeButton" type="button">Reverse Flow</button>
+            <button id="pdpModeButton" type="button">Required PDP</button>
+          </div>
+          <p class="helper" id="modeHelper">Reverse Flow: enter PDP to estimate GPM.</p>
+        </div>
         <div class="field">
-          <label for="pdp">Pump Discharge Pressure</label>
+          <label for="pdp" id="pdpLabel">Pump Discharge Pressure</label>
           <input id="pdp" inputmode="numeric" placeholder="PDP" />
         </div>
 
@@ -310,6 +340,7 @@
         <div class="field full">
           <label>Nozzle Pressure</label>
           <div id="pressureButtons" class="pressure-buttons"></div>
+          <div id="disabledPressureExplanations" class="disabled-explanations" hidden></div>
         </div>
 
         <div id="smoothboreTipField" class="field full" hidden>
@@ -337,10 +368,10 @@
 
     <section class="card">
       <div class="result-top">
-        <p class="result-label">Rounded Flow</p>
+        <p class="result-label" id="primaryResultLabel">Rounded Flow</p>
         <div class="result-number">
           <strong id="roundedGpm">—</strong>
-          <span>GPM</span>
+          <span id="primaryResultUnit">GPM</span>
         </div>
       </div>
       <div class="result-details">
@@ -359,6 +390,10 @@
         <div class="detail">
           <p>Nozzle</p>
           <strong id="nozzleDisplay">—</strong>
+        </div>
+        <div class="detail">
+          <p>Setup</p>
+          <strong id="setupDisplay">—</strong>
         </div>
       </div>
     </section>
@@ -405,7 +440,9 @@
     const STORAGE_KEY = "reverse-flow-calculator-v1-html";
 
     const DEFAULT_STATE = {
+      mode: "reverse",
       pdp: "",
+      targetGpm: "",
       hoseLength: "",
       hoseSize: "1.75",
       nozzleType: "fog",
@@ -419,6 +456,10 @@
     let state = loadState();
 
     const els = {
+      reverseModeButton: document.getElementById("reverseModeButton"),
+      pdpModeButton: document.getElementById("pdpModeButton"),
+      modeHelper: document.getElementById("modeHelper"),
+      pdpLabel: document.getElementById("pdpLabel"),
       pdp: document.getElementById("pdp"),
       hoseLength: document.getElementById("hoseLength"),
       hoseSize: document.getElementById("hoseSize"),
@@ -426,15 +467,19 @@
       smoothboreTipField: document.getElementById("smoothboreTipField"),
       smoothboreTip: document.getElementById("smoothboreTip"),
       pressureButtons: document.getElementById("pressureButtons"),
+      disabledPressureExplanations: document.getElementById("disabledPressureExplanations"),
       applianceLoss: document.getElementById("applianceLoss"),
       coefficientToggle: document.getElementById("coefficientToggle"),
       customCoefficient: document.getElementById("customCoefficient"),
       coefficientHelper: document.getElementById("coefficientHelper"),
+      primaryResultLabel: document.getElementById("primaryResultLabel"),
+      primaryResultUnit: document.getElementById("primaryResultUnit"),
       roundedGpm: document.getElementById("roundedGpm"),
       calculatedGpm: document.getElementById("calculatedGpm"),
       totalFl: document.getElementById("totalFl"),
       flPer100: document.getElementById("flPer100"),
       nozzleDisplay: document.getElementById("nozzleDisplay"),
+      setupDisplay: document.getElementById("setupDisplay"),
       warningsCard: document.getElementById("warningsCard"),
       resetButton: document.getElementById("resetButton"),
     };
@@ -475,10 +520,18 @@
     }
 
     function bindEvents() {
+      els.reverseModeButton.addEventListener("click", () => setMode("reverse"));
+      els.pdpModeButton.addEventListener("click", () => setMode("requiredPdp"));
+
       ["pdp", "hoseLength", "applianceLoss", "customCoefficient"].forEach(id => {
         els[id].addEventListener("input", e => {
-          state[id] = wholeNumber(e.target.value);
-          e.target.value = state[id];
+          if (id === "pdp" && state.mode === "requiredPdp") {
+            state.targetGpm = wholeNumber(e.target.value);
+            e.target.value = state.targetGpm;
+          } else {
+            state[id] = wholeNumber(e.target.value);
+            e.target.value = state[id];
+          }
           saveState();
           enforceValidNozzlePressure();
           renderPressureButtons();
@@ -528,8 +581,17 @@
       });
     }
 
+    function setMode(mode) {
+      state.mode = mode;
+      saveState();
+      syncModeUi();
+      enforceValidNozzlePressure();
+      renderPressureButtons();
+      calculateAndRender();
+    }
+
     function syncInputsFromState() {
-      els.pdp.value = state.pdp;
+      els.pdp.value = state.mode === "requiredPdp" ? state.targetGpm : state.pdp;
       els.hoseLength.value = state.hoseLength;
       els.hoseSize.value = state.hoseSize;
       els.nozzleType.value = state.nozzleType;
@@ -538,6 +600,21 @@
       els.customCoefficient.value = state.customCoefficient;
       syncCoefficientUi();
       syncSmoothboreUi();
+      syncModeUi();
+    }
+
+    function syncModeUi() {
+      const isRequiredPdp = state.mode === "requiredPdp";
+      els.reverseModeButton.classList.toggle("active", !isRequiredPdp);
+      els.pdpModeButton.classList.toggle("active", isRequiredPdp);
+      els.pdpLabel.textContent = isRequiredPdp ? "Target Flow" : "Pump Discharge Pressure";
+      els.pdp.placeholder = isRequiredPdp ? "GPM" : "PDP";
+      els.pdp.value = isRequiredPdp ? state.targetGpm : state.pdp;
+      els.modeHelper.textContent = isRequiredPdp
+        ? "Required PDP: enter target GPM to calculate the needed pump pressure."
+        : "Reverse Flow: enter PDP to estimate GPM.";
+      els.primaryResultLabel.textContent = isRequiredPdp ? "Required PDP" : "Rounded Flow";
+      els.primaryResultUnit.textContent = isRequiredPdp ? "PSI" : "GPM";
     }
 
     function syncSmoothboreUi() {
@@ -557,11 +634,23 @@
 
     function renderPressureButtons() {
       const pressures = NOZZLE_PRESSURES[state.nozzleType];
+      const disabledNotes = [];
       els.pressureButtons.innerHTML = pressures.map(pressure => {
         const availability = getNozzlePressureAvailability(pressure);
         const isActive = state.nozzlePressure === String(pressure);
+        if (!availability.available && availability.reason) {
+          disabledNotes.push(`${pressure} psi: ${availability.reason}`);
+        }
         return `<button type="button" data-pressure="${pressure}" class="${isActive ? "active" : ""}" ${availability.available ? "" : "disabled"} title="${availability.reason || ""}">${pressure} psi</button>`;
       }).join("");
+
+      if (disabledNotes.length && state.nozzleType === "smoothbore" && state.mode === "reverse") {
+        els.disabledPressureExplanations.hidden = false;
+        els.disabledPressureExplanations.innerHTML = disabledNotes.map(note => `<div class="disabled-note">${note}</div>`).join("");
+      } else {
+        els.disabledPressureExplanations.hidden = true;
+        els.disabledPressureExplanations.innerHTML = "";
+      }
 
       els.pressureButtons.querySelectorAll("button").forEach(button => {
         button.addEventListener("click", () => {
@@ -575,6 +664,7 @@
     }
 
     function enforceValidNozzlePressure() {
+      if (state.mode === "requiredPdp") return;
       if (state.nozzleType !== "smoothbore") return;
       const pressures = NOZZLE_PRESSURES[state.nozzleType];
       const selectedAvailability = getNozzlePressureAvailability(Number(state.nozzlePressure));
@@ -586,6 +676,10 @@
     }
 
     function getNozzlePressureAvailability(pressure) {
+      if (state.mode === "requiredPdp") {
+        return { available: true };
+      }
+
       if (state.nozzleType !== "smoothbore") {
         return { available: true };
       }
@@ -629,13 +723,19 @@
         : selectedHose.coefficient;
 
       const pdp = numberOrNull(state.pdp);
+      const targetGpm = numberOrNull(state.targetGpm);
       const hoseLength = numberOrNull(state.hoseLength);
       const nozzlePressure = numberOrNull(state.nozzlePressure);
       const applianceLoss = numberOrNull(state.applianceLoss) ?? 0;
 
       const warnings = [];
 
-      setResult("—", "—", "—", "—", getNozzleDisplay());
+      setResult("—", "—", "—", "—", getNozzleDisplay(), getSetupDisplay());
+
+      if (state.mode === "requiredPdp") {
+        calculateRequiredPdp({ targetGpm, hoseLength, nozzlePressure, applianceLoss, coefficient, selectedHose, warnings });
+        return;
+      }
 
       if (pdp === null || hoseLength === null || nozzlePressure === null || coefficient === null) {
         renderWarnings(warnings);
@@ -671,7 +771,7 @@
 
       if (totalFrictionLoss < 0) {
         warnings.push("Total friction loss is negative after subtracting nozzle pressure and appliance/elevation loss.");
-        setResult("—", "—", `${Math.round(totalFrictionLoss)} psi`, "—", getNozzleDisplay());
+        setResult("—", "—", `${Math.round(totalFrictionLoss)} psi`, "—", getNozzleDisplay(), getSetupDisplay());
         renderWarnings(warnings);
         return;
       }
@@ -689,17 +789,70 @@
         `${Math.round(calculatedGpm)} GPM`,
         `${Math.round(totalFrictionLoss)} psi`,
         `${Math.round(frictionLossPer100)} psi`,
-        getNozzleDisplay()
+        getNozzleDisplay(),
+        getSetupDisplay()
       );
       renderWarnings(warnings);
     }
 
-    function setResult(rounded, calculated, total, per100, nozzle) {
+    function calculateRequiredPdp({ targetGpm, hoseLength, nozzlePressure, applianceLoss, coefficient, selectedHose, warnings }) {
+      if (targetGpm === null || hoseLength === null || nozzlePressure === null || coefficient === null) {
+        renderWarnings(warnings);
+        return;
+      }
+
+      if (hoseLength <= 0) {
+        warnings.push("Hose length must be greater than 0 feet.");
+        renderWarnings(warnings);
+        return;
+      }
+
+      if (targetGpm <= 0) {
+        warnings.push("Target flow must be greater than 0 GPM.");
+        renderWarnings(warnings);
+        return;
+      }
+
+      if (coefficient <= 0) {
+        warnings.push("Hose coefficient must be greater than 0.");
+        renderWarnings(warnings);
+        return;
+      }
+
+      const q = targetGpm / 100;
+      const lengthHundreds = hoseLength / 100;
+      const totalFrictionLoss = coefficient * q * q * lengthHundreds;
+      const frictionLossPer100 = coefficient * q * q;
+      const requiredPdp = nozzlePressure + totalFrictionLoss + applianceLoss;
+      const roundedRequiredPdp = Math.round(requiredPdp);
+
+      if (targetGpm > selectedHose.maxReferenceFlow) {
+        warnings.push(`Target flow exceeds the pump-chart reference range for ${selectedHose.chartName} hose.`);
+      }
+
+      setResult(
+        roundedRequiredPdp,
+        `${Math.round(targetGpm)} GPM`,
+        `${Math.round(totalFrictionLoss)} psi`,
+        `${Math.round(frictionLossPer100)} psi`,
+        getNozzleDisplay(),
+        getSetupDisplay()
+      );
+      renderWarnings(warnings);
+    }
+
+    function setResult(rounded, calculated, total, per100, nozzle, setup) {
       els.roundedGpm.textContent = rounded;
       els.calculatedGpm.textContent = calculated;
       els.totalFl.textContent = total;
       els.flPer100.textContent = per100;
       els.nozzleDisplay.textContent = nozzle;
+      els.setupDisplay.textContent = setup;
+    }
+
+    function getSetupDisplay() {
+      const hose = getSelectedHose();
+      return `${state.hoseLength || "—"}' of ${hose.label}`;
     }
 
     function getNozzleDisplay() {
