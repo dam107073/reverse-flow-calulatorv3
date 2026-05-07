@@ -145,6 +145,21 @@
       font-weight: 650;
     }
 
+    .calculated-pressure-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .calculated-pressure-card strong {
+      display: block;
+      font-size: 28px;
+      color: var(--ink);
+      line-height: 1.1;
+      margin-top: 4px;
+    }
+
     button {
       height: 46px;
       border: 1px solid #cbd5e1;
@@ -360,8 +375,12 @@
         </div>
 
         <div class="field full">
-          <label>Nozzle Pressure</label>
+          <label id="nozzlePressureLabel">Nozzle Pressure</label>
           <div id="pressureButtons" class="pressure-buttons"></div>
+          <div id="calculatedNozzlePressure" class="calculated-pressure-card" hidden>
+            <span class="helper">Calculated highest achievable nozzle pressure</span>
+            <strong id="calculatedNozzlePressureValue">— psi</strong>
+          </div>
           <div id="disabledPressureExplanations" class="disabled-explanations" hidden></div>
         </div>
 
@@ -501,6 +520,9 @@
       smoothboreTipField: document.getElementById("smoothboreTipField"),
       smoothboreTip: document.getElementById("smoothboreTip"),
       pressureButtons: document.getElementById("pressureButtons"),
+      nozzlePressureLabel: document.getElementById("nozzlePressureLabel"),
+      calculatedNozzlePressure: document.getElementById("calculatedNozzlePressure"),
+      calculatedNozzlePressureValue: document.getElementById("calculatedNozzlePressureValue"),
       disabledPressureExplanations: document.getElementById("disabledPressureExplanations"),
       applianceLoss: document.getElementById("applianceLoss"),
       coefficientToggle: document.getElementById("coefficientToggle"),
@@ -675,24 +697,32 @@
     }
 
     function renderPressureButtons() {
-      const pressures = NOZZLE_PRESSURES[state.nozzleType];
-      const disabledNotes = [];
-      els.pressureButtons.innerHTML = pressures.map(pressure => {
-        const availability = getNozzlePressureAvailability(pressure);
-        const isActive = state.nozzlePressure === String(pressure);
-        if (!availability.available && availability.reason) {
-          disabledNotes.push(`${pressure} psi: ${availability.reason}`);
-        }
-        return `<button type="button" data-pressure="${pressure}" class="${isActive ? "active" : ""}" ${availability.available ? "" : "disabled"} title="${availability.reason || ""}">${pressure} psi</button>`;
-      }).join("");
+      const reverseSmoothbore = state.mode === "reverse" && state.nozzleType === "smoothbore";
 
-      if (disabledNotes.length && state.nozzleType === "smoothbore" && state.mode === "reverse") {
-        els.disabledPressureExplanations.hidden = false;
-        els.disabledPressureExplanations.innerHTML = disabledNotes.map(note => `<div class="disabled-note">${note}</div>`).join("");
-      } else {
+      if (reverseSmoothbore) {
+        const calculatedPressure = calculateAchievableSmoothborePressure();
+        els.nozzlePressureLabel.textContent = "Calculated Nozzle Pressure";
+        els.pressureButtons.hidden = true;
+        els.pressureButtons.innerHTML = "";
+        els.calculatedNozzlePressure.hidden = false;
+        els.calculatedNozzlePressureValue.textContent = calculatedPressure === null ? "— psi" : `${calculatedPressure} psi`;
         els.disabledPressureExplanations.hidden = true;
         els.disabledPressureExplanations.innerHTML = "";
+        return;
       }
+
+      els.nozzlePressureLabel.textContent = "Nozzle Pressure";
+      els.pressureButtons.hidden = false;
+      els.calculatedNozzlePressure.hidden = true;
+      els.calculatedNozzlePressureValue.textContent = "— psi";
+      els.disabledPressureExplanations.hidden = true;
+      els.disabledPressureExplanations.innerHTML = "";
+
+      const pressures = NOZZLE_PRESSURES[state.nozzleType];
+      els.pressureButtons.innerHTML = pressures.map(pressure => {
+        const isActive = state.nozzlePressure === String(pressure);
+        return `<button type="button" data-pressure="${pressure}" class="${isActive ? "active" : ""}">${pressure} psi</button>`;
+      }).join("");
 
       els.pressureButtons.querySelectorAll("button").forEach(button => {
         button.addEventListener("click", () => {
@@ -708,31 +738,11 @@
     }
 
     function enforceValidNozzlePressure() {
-      if (state.mode === "requiredPdp") return;
-      if (state.nozzleType !== "smoothbore") return;
-
-      const pressures = NOZZLE_PRESSURES[state.nozzleType];
-      const availablePressures = pressures.filter(pressure => getNozzlePressureAvailability(pressure).available);
-
-      if (!availablePressures.length) {
-        state.nozzlePressure = "";
-        saveState();
-        return;
-      }
-
-      const highestAvailablePressure = Math.max(...availablePressures);
-      state.nozzlePressure = String(highestAvailablePressure);
-      saveState();
+      // No-op retained for older event calls. Reverse smoothbore now calculates NP directly.
     }
 
-    function getNozzlePressureAvailability(pressure) {
-      if (state.mode === "requiredPdp") {
-        return { available: true };
-      }
-
-      if (state.nozzleType !== "smoothbore") {
-        return { available: true };
-      }
+    function calculateAchievableSmoothborePressure() {
+      if (state.mode !== "reverse" || state.nozzleType !== "smoothbore") return null;
 
       const pdp = numberOrNull(state.pdp);
       const hoseLength = numberOrNull(state.hoseLength);
@@ -744,26 +754,18 @@
       const tip = getSelectedSmoothboreTip();
 
       if (pdp === null || hoseLength === null || coefficient === null || !tip || hoseLength <= 0 || coefficient <= 0) {
-        return { available: true };
+        return null;
       }
 
-      const gpm = smoothboreGpm(tip.diameter, pressure);
-      const q = gpm / 100;
+      const usablePressure = pdp - applianceLoss;
+      if (usablePressure <= 0) return 0;
+
       const lengthHundreds = hoseLength / 100;
-      const requiredFrictionLoss = coefficient * q * q * lengthHundreds;
-      const requiredPdp = pressure + requiredFrictionLoss + applianceLoss;
+      const tipConstant = 29.7 * tip.diameter * tip.diameter / 100;
+      const frictionMultiplier = coefficient * tipConstant * tipConstant * lengthHundreds;
+      const achievablePressure = usablePressure / (1 + frictionMultiplier);
 
-      const pressureTolerance = 10;
-
-      if (pdp + pressureTolerance >= requiredPdp) {
-        return { available: true, requiredPdp };
-      }
-
-      return {
-        available: false,
-        requiredPdp,
-        reason: `Requires about ${Math.ceil(requiredPdp)} psi PDP for this hose setup (±10 psi tolerance applied).`
-      };
+      return Math.max(0, Math.floor(achievablePressure));
     }
 
     function calculateAndRender() {
@@ -776,7 +778,11 @@
       syncCalculatedSmoothboreTargetFlow();
       const targetGpm = numberOrNull(getTargetFlowValue());
       const hoseLength = numberOrNull(state.hoseLength);
-      const nozzlePressure = numberOrNull(state.nozzlePressure);
+      let nozzlePressure = numberOrNull(state.nozzlePressure);
+
+      if (state.mode === "reverse" && state.nozzleType === "smoothbore") {
+        nozzlePressure = calculateAchievableSmoothborePressure();
+      }
       const applianceLoss = numberOrNull(state.applianceLoss) ?? 0;
 
       const warnings = [];
@@ -924,7 +930,10 @@
     function getNozzleDisplay() {
       if (state.nozzleType === "smoothbore") {
         const tip = getSelectedSmoothboreTip();
-        return `${tip ? tip.label : state.smoothboreTip} SB @ ${state.nozzlePressure || "—"} psi`;
+        const displayedPressure = state.mode === "reverse"
+          ? calculateAchievableSmoothborePressure()
+          : state.nozzlePressure;
+        return `${tip ? tip.label : state.smoothboreTip} SB @ ${displayedPressure ?? "—"} psi`;
       }
       return `Fog @ ${state.nozzlePressure} psi`;
     }
