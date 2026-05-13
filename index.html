@@ -547,6 +547,8 @@ The only calculator that can calculate GPM and Nozzle Pressure backwards from PD
     <section id="warningsCard" class="card warnings" hidden></section>
 
     <div class="footer-actions">
+      <button id="deletePresetButton" class="reset-button" type="button"> Delete Preset </button>
+      
       <button id="resetButton" class="reset-button" type="button">↺ Reset</button>
     </div>
 
@@ -649,6 +651,7 @@ The only calculator that can calculate GPM and Nozzle Pressure backwards from PD
       setupDisplay: document.getElementById("setupDisplay"),
       warningsCard: document.getElementById("warningsCard"),
       resetButton: document.getElementById("resetButton"),
+      deletPresetButton: document.getElementById("deletePresetButton"),
     };
 
     init();
@@ -691,6 +694,8 @@ The only calculator that can calculate GPM and Nozzle Pressure backwards from PD
       els.presetSelect.addEventListener("change", e => {
   applyPreset(e.target.value);
 });
+      els.deletePresetButton.addEventListener("click", deleteSelectedPreset);
+      
       els.savePresetButton.addEventListener("click", saveCurrentSetupAsPreset);
       
       els.reverseModeButton.addEventListener("click", () => setMode("reverse"));
@@ -1161,6 +1166,37 @@ function savePresets(presets) {
   syncInputsFromState();
   renderPressureButtons();
   calculateAndRender();
+}
+    function deleteSelectedPreset() {
+  const selectedId = els.presetSelect.value;
+
+  if (!selectedId) {
+    alert("No preset selected.");
+    return;
+  }
+
+  const presets = loadPresets();
+  const preset = presets.find(item => item.id === selectedId);
+
+  if (!preset) return;
+
+  const confirmed = confirm(
+    `Delete preset "${preset.name}"?`
+  );
+
+  if (!confirmed) return;
+
+  const updatedPresets = presets.filter(
+    item => item.id !== selectedId
+  );
+
+  savePresets(updatedPresets);
+
+  renderPresetOptions();
+
+  els.presetSelect.value = "";
+
+  alert(`Deleted preset: ${preset.name}`);
 }
   </script>
 </body>
