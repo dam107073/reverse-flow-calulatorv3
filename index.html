@@ -686,6 +686,9 @@ The only calculator that can calculate GPM and Nozzle Pressure backwards from PD
     }
 
     function bindEvents() {
+      els.presetSelect.addEventListener("change", e => {
+  applyPreset(e.target.value);
+});
       els.reverseModeButton.addEventListener("click", () => setMode("reverse"));
       els.pdpModeButton.addEventListener("click", () => setMode("requiredPdp"));
 
@@ -1100,6 +1103,31 @@ The only calculator that can calculate GPM and Nozzle Pressure backwards from PD
 
 function savePresets(presets) {
   localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+}
+    function applyPreset(presetId) {
+  if (!presetId) return;
+
+  const presets = loadPresets();
+  const preset = presets.find(item => item.id === presetId);
+
+  if (!preset) return;
+
+  state = {
+    ...state,
+    hoseLength: preset.hoseLength || "",
+    hoseSize: preset.hoseSize || "",
+    nozzleType: preset.nozzleType || "",
+    nozzlePressure: preset.nozzlePressure || "",
+    smoothboreTip: preset.smoothboreTip || "",
+    applianceLoss: preset.applianceLoss || "0",
+    useCustomCoefficient: preset.useCustomCoefficient || false,
+    customCoefficient: preset.customCoefficient || ""
+  };
+
+  saveState();
+  syncInputsFromState();
+  renderPressureButtons();
+  calculateAndRender();
 }
   </script>
 </body>
