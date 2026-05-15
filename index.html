@@ -837,6 +837,34 @@ All-in-one Hydraulic APP for the fire service.
 
   const presets = loadPresets();
 
+      const existingPreset = presets.find(
+  preset => preset.name.toLowerCase() === name.trim().toLowerCase()
+);
+
+if (existingPreset) {
+  const overwrite = confirm(
+    `A preset named "${existingPreset.name}" already exists. Overwrite it?`
+  );
+
+  if (!overwrite) return;
+
+  existingPreset.hoseLength = state.hoseLength || "";
+  existingPreset.hoseSize = state.hoseSize || "";
+  existingPreset.nozzleType = state.nozzleType || "";
+  existingPreset.nozzlePressure = state.nozzlePressure || "";
+  existingPreset.smoothboreTip = state.smoothboreTip || "";
+  existingPreset.applianceLoss = state.applianceLoss || "0";
+  existingPreset.useCustomCoefficient = state.useCustomCoefficient || false;
+  existingPreset.customCoefficient = state.customCoefficient || "";
+
+  savePresets(presets);
+  renderPresetOptions();
+  els.presetSelect.value = existingPreset.id;
+
+  alert(`Updated preset: ${existingPreset.name}`);
+  return;
+}
+
   const newPreset = {
     id: `preset-${Date.now()}`,
     name: name.trim(),
