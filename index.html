@@ -615,7 +615,7 @@ All-in-One Hydraulic Application for the fire service.
       hoseSize: "1.88",
       nozzleType: "fog",
       nozzlePressure: "55",
-      smoothboreTip: "15/16",
+      smoothboreTip: "",
       applianceLoss: "0",
       useCustomCoefficient: false,
       customCoefficient: "",
@@ -812,8 +812,16 @@ All-in-One Hydraulic Application for the fire service.
     }
 
     function syncSmoothboreUi() {
-      els.smoothboreTipField.hidden = state.nozzleType !== "smoothbore";
-    }
+  const isSmoothbore = state.nozzleType === "smoothbore";
+
+  els.smoothboreTipField.hidden = !isSmoothbore;
+  els.smoothboreTipField.style.display = isSmoothbore ? "" : "none";
+
+  if (!isSmoothbore) {
+    state.smoothboreTip = "";
+    els.smoothboreTip.value = "";
+  }
+}
 
     function syncCoefficientUi() {
       const selectedHose = getSelectedHose();
