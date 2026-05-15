@@ -1039,6 +1039,8 @@ if (existingPreset) {
         : Math.sqrt(frictionLossPer100 / coefficient) * 100;
       const roundedGpm = roundToNearestFive(calculatedGpm);
 
+      const nozzleReaction = calculateNozzleReaction(calculatedGpm, nozzlePressure);
+
       if (roundedGpm > selectedHose.maxReferenceFlow) {
         warnings.push(`Rounded flow exceeds the pump-chart reference range for ${selectedHose.chartName} hose.`);
       }
@@ -1049,7 +1051,8 @@ if (existingPreset) {
         `${Math.round(totalFrictionLoss)} psi`,
         `${Math.round(frictionLossPer100)} psi`,
         getNozzleDisplay(),
-        getSetupDisplay()
+        getSetupDisplay(),
+        nozzleReaction
       );
       renderWarnings(warnings);
     }
