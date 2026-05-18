@@ -510,8 +510,15 @@ All-in-One Hydraulic Application for the fire service.
             <label for="customCoefficient">Custom Coefficient</label>
             <button id="coefficientToggle" class="small-button" type="button">Off</button>
           </div>
-          <input id="customCoefficient" inputmode="numeric" placeholder="Default coefficient" disabled />
-          <p id="coefficientHelper" class="helper"></p>
+ <input
+  id="customCoefficient"
+  type="text"
+  step="any"
+  inputmode="decimal"
+  placeholder="Default coefficient"
+  disabled
+/>
+<p id="coefficientHelper" class="helper"></p>
         </div>
       </div>
     </section>
@@ -565,7 +572,7 @@ All-in-One Hydraulic Application for the fire service.
       <p>Total friction loss = PDP − nozzle pressure − appliance/elevation loss.</p>
       <p>Friction loss per 100' = total friction loss ÷ hose length in hundreds of feet.</p>
       <p>GPM = √(FL per 100' ÷ coefficient) × 100. Final result rounds to the nearest 5 GPM.</p>
-      <p>Default coefficients: 1.75” = 15.5, 1.88” = 8, 2.5” = 2, 3” = 0.8, 5” = 0.08.</p>
+     <p>Default coefficients: 1.75” = 15.5, 1.88” = 8, 2” = 4, 2.25” = 3, 2.5” = 2, 3” = 0.8, 4” = 0.2, 5” = 0.08.</p>
     </section>
 
     <section class="card">
@@ -584,13 +591,17 @@ All-in-One Hydraulic Application for the fire service.
   <script>
     const APP_VERSION = "3.3.1";
     console.log(`Reverse Flow Calculator v${APP_VERSION}`);
+
     const HOSE_OPTIONS = [
-      { id: "1.75", label: '1.75"', coefficient: 15.5, maxReferenceFlow: 250, chartName: '1 3/4" / 1.75"' },
-      { id: "1.88", label: '1.88"', coefficient: 8, maxReferenceFlow: 250, chartName: '1.88" FDNY' },
-      { id: "2.5", label: '2.5"', coefficient: 2, maxReferenceFlow: 550, chartName: '2 1/2"' },
-      { id: "3", label: '3"', coefficient: 0.8, maxReferenceFlow: 900, chartName: '3"' },
-      { id: "5", label: '5"', coefficient: 0.08, maxReferenceFlow: 2000, chartName: '5"' },
-    ];
+  { id: "1.75", label: '1.75"', coefficient: 15.5, maxReferenceFlow: 250, chartName: '1 3/4" / 1.75"' },
+  { id: "1.88", label: '1.88"', coefficient: 8, maxReferenceFlow: 250, chartName: '1.88" FDNY' },
+  { id: "2", label: '2"', coefficient: 4, maxReferenceFlow: 350, chartName: '2"' },
+  { id: "2.25", label: '2.25"', coefficient: 3, maxReferenceFlow: 450, chartName: '2.25"' },
+  { id: "2.5", label: '2.5"', coefficient: 2, maxReferenceFlow: 550, chartName: '2 1/2"' },
+  { id: "3", label: '3"', coefficient: 0.8, maxReferenceFlow: 900, chartName: '3"' },
+  { id: "4", label: '4"', coefficient: 0.2, maxReferenceFlow: 1200, chartName: '4"' },
+  { id: "5", label: '5"', coefficient: 0.08, maxReferenceFlow: 2000, chartName: '5"' },
+];
 
     const NOZZLE_PRESSURES = {
       fog: [50, 55, 75, 100],
@@ -714,21 +725,32 @@ All-in-One Hydraulic Application for the fire service.
       
       els.pdpModeButton.addEventListener("click", () => setMode("requiredPdp"));
 
-      ["pdp", "hoseLength", "applianceLoss", "customCoefficient"].forEach(id => {
-        els[id].addEventListener("input", e => {
-          if (id === "pdp" && state.mode === "requiredPdp") {
-            state.targetGpm = wholeNumber(e.target.value);
-            e.target.value = state.targetGpm;
-          } else {
-            state[id] = wholeNumber(e.target.value);
-            e.target.value = state[id];
-          }
-          saveState();
-          enforceValidNozzlePressure();
-          renderPressureButtons();
-          calculateAndRender();
-        });
-      });
+    ["pdp", "hoseLength", "applianceLoss"].forEach(id => {
+  els[id].addEventListener("input", e => {
+    if (id === "pdp" && state.mode === "requiredPdp") {
+      state.targetGpm = wholeNumber(e.target.value);
+      e.target.value = state.targetGpm;
+    } else {
+      state[id] = wholeNumber(e.target.value);
+      e.target.value = state[id];
+    }
+
+    saveState();
+    enforceValidNozzlePressure();
+    renderPressureButtons();
+    calculateAndRender();
+  });
+});
+
+els.customCoefficient.addEventListener("input", e => {
+  state.customCoefficient = decimalNumber(e.target.value);
+  e.target.value = state.customCoefficient;
+
+  saveState();
+  enforceValidNozzlePressure();
+  renderPressureButtons();
+  calculateAndRender();
+});
 
       els.hoseSize.addEventListener("change", e => {
         state.hoseSize = e.target.value;
@@ -761,11 +783,18 @@ All-in-One Hydraulic Application for the fire service.
       });
 
       els.coefficientToggle.addEventListener("click", () => {
-        state.useCustomCoefficient = !state.useCustomCoefficient;
-        saveState();
-        syncCoefficientUi();
-        calculateAndRender();
-      });
+  state.useCustomCoefficient = !state.useCustomCoefficient;
+
+  // Clear custom coefficient when toggled off
+  if (!state.useCustomCoefficient) {
+    state.customCoefficient = "";
+    els.customCoefficient.value = "";
+  }
+
+  saveState();
+  syncCoefficientUi();
+  calculateAndRender();
+});
 
       els.resetButton.addEventListener("click", () => {
         state = { ...DEFAULT_STATE };
@@ -1102,21 +1131,23 @@ if (existingPreset) {
       const frictionLossPer100 = coefficient * q * q;
       const requiredPdp = nozzlePressure + totalFrictionLoss + applianceLoss;
       const roundedRequiredPdp = Math.round(requiredPdp);
+      const nozzleReaction = calculateNozzleReaction(targetGpm, nozzlePressure);
 
       if (targetGpm > selectedHose.maxReferenceFlow) {
         warnings.push(`Target flow exceeds the pump-chart reference range for ${selectedHose.chartName} hose.`);
       }
 
-      setResult(
-        roundedRequiredPdp,
-        `${Math.round(targetGpm)} GPM`,
-        `${Math.round(totalFrictionLoss)} psi`,
-        `${Math.round(frictionLossPer100)} psi`,
-        getNozzleDisplay(),
-        getSetupDisplay()
-      );
+setResult(
+  roundedRequiredPdp,
+  `${Math.round(targetGpm)} GPM`,
+  `${Math.round(totalFrictionLoss)} psi`,
+  `${Math.round(frictionLossPer100)} psi`,
+  getNozzleDisplay(),
+  getSetupDisplay(),
+  nozzleReaction
+);
       renderWarnings(warnings);
-    }
+}
 
     function setResult(rounded, calculated, total, per100, nozzle, setup, reaction = "-") {
       els.roundedGpm.textContent = rounded;
@@ -1188,8 +1219,19 @@ if (existingPreset) {
     }
 
     function wholeNumber(value) {
-      return String(value).replace(/[^0-9]/g, "");
-    }
+  return String(value).replace(/[^0-9]/g, "");
+}
+    function decimalNumber(value) {
+  value = String(value).replace(/[^0-9.]/g, "");
+
+  const parts = value.split(".");
+
+  if (parts.length > 2) {
+    value = parts[0] + "." + parts.slice(1).join("");
+  }
+
+  return value;
+}
 
     function numberOrNull(value) {
       if (value === "" || value === null || value === undefined) return null;
