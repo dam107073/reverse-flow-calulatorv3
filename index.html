@@ -512,7 +512,7 @@ All-in-One Hydraulic Application for the fire service.
           </div>
  <input
   id="customCoefficient"
-  type="number"
+  type="text"
   step="any"
   inputmode="decimal"
   placeholder="Default coefficient"
@@ -1194,7 +1194,7 @@ if (existingPreset) {
       return HOSE_OPTIONS.find(hose => hose.id === state.hoseSize) || HOSE_OPTIONS[0];
     }
 
-    function wholeNumber(value) {
+    function decimalNumber(value) {
   value = String(value).replace(/[^0-9.]/g, "");
 
   const parts = value.split(".");
