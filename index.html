@@ -721,21 +721,32 @@ All-in-One Hydraulic Application for the fire service.
       
       els.pdpModeButton.addEventListener("click", () => setMode("requiredPdp"));
 
-      ["pdp", "hoseLength", "applianceLoss", "customCoefficient"].forEach(id => {
-        els[id].addEventListener("input", e => {
-          if (id === "pdp" && state.mode === "requiredPdp") {
-            state.targetGpm = wholeNumber(e.target.value);
-            e.target.value = state.targetGpm;
-          } else {
-            state[id] = wholeNumber(e.target.value);
-            e.target.value = state[id];
-          }
-          saveState();
-          enforceValidNozzlePressure();
-          renderPressureButtons();
-          calculateAndRender();
-        });
-      });
+    ["pdp", "hoseLength", "applianceLoss"].forEach(id => {
+  els[id].addEventListener("input", e => {
+    if (id === "pdp" && state.mode === "requiredPdp") {
+      state.targetGpm = wholeNumber(e.target.value);
+      e.target.value = state.targetGpm;
+    } else {
+      state[id] = wholeNumber(e.target.value);
+      e.target.value = state[id];
+    }
+
+    saveState();
+    enforceValidNozzlePressure();
+    renderPressureButtons();
+    calculateAndRender();
+  });
+});
+
+els.customCoefficient.addEventListener("input", e => {
+  state.customCoefficient = decimalNumber(e.target.value);
+  e.target.value = state.customCoefficient;
+
+  saveState();
+  enforceValidNozzlePressure();
+  renderPressureButtons();
+  calculateAndRender();
+});
 
       els.hoseSize.addEventListener("change", e => {
         state.hoseSize = e.target.value;
@@ -1194,6 +1205,9 @@ if (existingPreset) {
       return HOSE_OPTIONS.find(hose => hose.id === state.hoseSize) || HOSE_OPTIONS[0];
     }
 
+    function wholeNumber(value) {
+  return String(value).replace(/[^0-9]/g, "");
+}
     function decimalNumber(value) {
   value = String(value).replace(/[^0-9.]/g, "");
 
