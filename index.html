@@ -779,11 +779,18 @@ els.customCoefficient.addEventListener("input", e => {
       });
 
       els.coefficientToggle.addEventListener("click", () => {
-        state.useCustomCoefficient = !state.useCustomCoefficient;
-        saveState();
-        syncCoefficientUi();
-        calculateAndRender();
-      });
+  state.useCustomCoefficient = !state.useCustomCoefficient;
+
+  // Clear custom coefficient when toggled off
+  if (!state.useCustomCoefficient) {
+    state.customCoefficient = "";
+    els.customCoefficient.value = "";
+  }
+
+  saveState();
+  syncCoefficientUi();
+  calculateAndRender();
+});
 
       els.resetButton.addEventListener("click", () => {
         state = { ...DEFAULT_STATE };
