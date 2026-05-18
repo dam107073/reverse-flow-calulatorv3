@@ -1135,6 +1135,8 @@ setResult(
   getSetupDisplay(),
   nozzleReaction
 );
+      renderWarnings(warnings);
+}
 
     function setResult(rounded, calculated, total, per100, nozzle, setup, reaction = "-") {
       els.roundedGpm.textContent = rounded;
