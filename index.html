@@ -497,7 +497,7 @@
         </div>
 
         <div class="field">
-          <label for="nozzleType">Nozzle Type</label>
+          <label for="nozzleType" id="nozzleTypeLabel">Nozzle Type</label>
           <select id="nozzleType">
             <option value="fog">Fog</option>
             <option value="smoothbore">Smoothbore</option>
@@ -696,6 +696,7 @@
       pdp: document.getElementById("pdp"),
       hoseLength: document.getElementById("hoseLength"),
       hoseSize: document.getElementById("hoseSize"),
+      nozzleTypeLabel: document.getElementById("nozzleTypeLabel"),
       nozzleType: document.getElementById("nozzleType"),
       smoothboreTipField: document.getElementById("smoothboreTipField"),
       smoothboreTip: document.getElementById("smoothboreTip"),
@@ -939,9 +940,13 @@ document.querySelector('label[for="applianceLoss"]').textContent =
   isRelayMode() || isRequiredPdpMode()
     ? "PSI"
     : "GPM";
+    els.nozzleType.closest(".field").style.display = "";
+els.nozzleTypeLabel.textContent = isRelayMode()
+  ? "Receiving Engine Residual"
+  : "Nozzle Type";
 
-  els.nozzleType.closest(".field").style.display = isRelayMode() ? "none" : "";
-  els.nozzlePressureLabel.closest(".field").style.display = isRelayMode() ? "none" : "";
+els.nozzlePressureLabel.closest(".field").style.display = isRelayMode() ? "none" : "";
+
     }
 
     function syncSmoothboreUi() {
