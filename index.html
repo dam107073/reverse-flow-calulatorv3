@@ -911,6 +911,9 @@
   isRelayMode() || isRequiredPdpMode()
     ? "PSI"
     : "GPM";
+
+      els.nozzleType.closest(".field").hidden = isRelayMode();
+      els.nozzlePressureLabel.closest(".field").hidden = isRelayMode();
     }
 
     function syncSmoothboreUi() {
