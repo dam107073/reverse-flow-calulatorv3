@@ -944,6 +944,18 @@ document.querySelector('label[for="applianceLoss"]').textContent =
 els.nozzleTypeLabel.textContent = isRelayMode()
   ? "Receiving Engine Residual"
   : "Nozzle Type";
+      if (isRelayMode()) {
+  els.nozzleType.innerHTML = `
+    <option value="20">20 psi</option>
+    <option value="30">30 psi</option>
+    <option value="40">40 psi</option>
+  `;
+} else {
+  els.nozzleType.innerHTML = `
+    <option value="fog">Fog</option>
+    <option value="smoothbore">Smoothbore</option>
+  `;
+}
 
 els.nozzlePressureLabel.closest(".field").style.display = isRelayMode() ? "none" : "";
 
@@ -1052,7 +1064,17 @@ els.nozzlePressureLabel.closest(".field").style.display = isRelayMode() ? "none"
     function setMode(mode) {
     state.mode = mode;
 
-    populateHoseOptions();
+if (isRelayMode()) {
+  state.nozzleType = "30";
+  state.hoseSize = "5";
+}
+
+if (!isRelayMode() && !["fog", "smoothbore"].includes(state.nozzleType)) {
+  state.nozzleType = "fog";
+  state.hoseSize = "1.88";
+}
+
+populateHoseOptions();
 
     saveState();
     syncModeUi();
