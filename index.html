@@ -595,18 +595,43 @@
     </div>
 
     <section class="card formula">
-      <p><strong>Formula</strong></p>
-      <p>Total friction loss = PDP − nozzle pressure − appliance/elevation loss.</p>
-      <p>Friction loss per 100' = total friction loss ÷ hose length in hundreds of feet.</p>
-      <p>GPM = √(FL per 100' ÷ coefficient) × 100. Final result rounds to the nearest 5 GPM.</p>
-      <p>Default coefficients: 1.75” = 15.5, 1.88” = 8, 2” = 4, 2.25” = 3, 2.5” = 2, 3” = 0.8, 4” = 0.2, 5” = 0.08.</p>
+      <p><strong>Reverse Flow Formula</strong></p>
+<p>Total friction loss = PDP − nozzle pressure − appliance/elevation loss.</p>
+<p>Friction loss per 100' = total friction loss ÷ hose length in hundreds of feet.</p>
+<p>GPM = √(FL per 100' ÷ coefficient) × 100. Final result rounds to the nearest 5 GPM.</p>
+
+<br>
+
+<p><strong>Required PDP Formula</strong></p>
+<p>Required PDP = nozzle pressure + friction loss + appliance/elevation loss.</p>
+
+<br>
+
+<p><strong>Relay Pumping Formula</strong></p>
+<p>Relay PDP = relay friction loss + receiving engine residual + appliance/elevation loss.</p>
+
+<br>
+
+<p><strong>Default Coefficients</strong></p>
+<p>
+1.75” = 15.5,
+1.88” = 8,
+2” = 4,
+2.25” = 3,
+2.5” = 2,
+3” = 0.8,
+Dual 3” = 0.4,
+4” = 0.2,
+5” = 0.08
+</p>
     </section>
 
     <section class="card">
       <details class="about">
         <summary>About / How to Use</summary>
         <p><strong>Reverse Flow Mode</strong> Estimates GPM by working backwards using PDP, Nozzle Pressure, and Friction Loss.</p>
-        <p><strong>Required PDP Mode</strong> Calculates the pump discharge pressure needed to achieve a target GPM.</p>
+        <p><strong>Required PDP Mode</strong> Calculates the pump discharge pressure needed to achieve a target GPM.
+        </p><strong>Relay Pumping Mode</strong> Calculates the required PDP for a relay pumper to supply a receiving unit with specific target flow.
         <p>For smoothbore calculations, select the tip size manually when in PDP mode. Smoothbore nozzle pressures will be calculated automatically in Reverse Flow mode.</p>
         <p>This calculator is intended for training and reference. Always follow local pump charts, equipment testing, department policy, and instructor guidance.</p>
       </details>
@@ -622,7 +647,7 @@
     // ========================================
     // APP CONFIG
     // ========================================
-    const APP_VERSION = "3.3.2-cleanup";
+    const APP_VERSION = "3.4.0-beta-relay";
     const STORAGE_KEY = "reverse-flow-calculator-v3";
     const PRESETS_KEY = "reverse-flow-calculator-presets-v1";
 
@@ -958,6 +983,7 @@ document.querySelector('label[for="applianceLoss"]').textContent =
   els.flPer100Label.textContent = "FL / 100'";
   els.nozzleDisplayLabel.textContent = "Residual";
   els.reactionLabel.textContent = "Reserve";
+  els.nozzleReaction.parentElement.style.display = isRelayMode() ? "none" : "";
   els.setupLabel.textContent = "Relay Lay";
 
 } else {
@@ -968,6 +994,7 @@ document.querySelector('label[for="applianceLoss"]').textContent =
   els.nozzleDisplayLabel.textContent = "Nozzle";
   els.reactionLabel.textContent = "Reaction";
   els.setupLabel.textContent = "Setup";
+  els.nozzleReaction.parentElement.style.display = "";
 
 } 
     els.nozzleType.closest(".field").style.display = "";
@@ -994,14 +1021,21 @@ els.nozzlePressureLabel.closest(".field").style.display = isRelayMode() ? "none"
     }
 
     function syncSmoothboreUi() {
-      els.smoothboreTipField.hidden = !isSmoothbore();
-      els.smoothboreTipField.style.display = isSmoothbore() ? "" : "none";
 
-      if (!isSmoothbore()) {
-        state.smoothboreTip = "";
-        els.smoothboreTip.value = "";
-      }
-    }
+  if (isRelayMode()) {
+    els.smoothboreTipField.hidden = true;
+    els.smoothboreTipField.style.display = "none";
+    return;
+  }
+
+  els.smoothboreTipField.hidden = !isSmoothbore();
+  els.smoothboreTipField.style.display = isSmoothbore() ? "" : "none";
+
+  if (!isSmoothbore()) {
+    state.smoothboreTip = "";
+    els.smoothboreTip.value = "";
+  }
+}
 
     function syncCoefficientUi() {
       const selectedHose = getSelectedHose();
