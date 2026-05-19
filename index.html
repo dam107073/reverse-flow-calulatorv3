@@ -790,6 +790,14 @@
     }
 
     function renderPressureButtons() {
+      if (isRelayMode()) {
+  els.nozzlePressureLabel.closest(".field").style.display = "none";
+  els.pressureButtons.hidden = true;
+  els.pressureButtons.innerHTML = "";
+  els.calculatedNozzlePressure.hidden = true;
+  els.disabledPressureExplanations.hidden = true;
+  return;
+}
       if (isReverseSmoothbore()) {
         renderCalculatedSmoothborePressure();
         return;
@@ -912,8 +920,8 @@
     ? "PSI"
     : "GPM";
 
-      els.nozzleType.closest(".field").hidden = isRelayMode();
-      els.nozzlePressureLabel.closest(".field").hidden = isRelayMode();
+  els.nozzleType.closest(".field").style.display = isRelayMode() ? "none" : "";
+  els.nozzlePressureLabel.closest(".field").style.display = isRelayMode() ? "none" : "";
     }
 
     function syncSmoothboreUi() {
