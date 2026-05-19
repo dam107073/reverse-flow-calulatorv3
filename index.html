@@ -682,6 +682,7 @@
 
       reverseModeButton: document.getElementById("reverseModeButton"),
       pdpModeButton: document.getElementById("pdpModeButton"),
+      relayModeButton: document.getElementById("relayModeButton"),
       modeHelper: document.getElementById("modeHelper"),
 
       pdpLabel: document.getElementById("pdpLabel"),
@@ -869,6 +870,7 @@
 
       els.reverseModeButton.classList.toggle("active", isReverseMode());
       els.pdpModeButton.classList.toggle("active", isRequiredPdpMode());
+      els.relayModeButton.classlist.toggle("active",isRelayMode());
 
       els.pdpLabel.textContent = isRequiredPdpMode() ? "Target Flow" : "Pump Discharge Pressure";
       els.pdp.placeholder = isRequiredPdpMode() ? "GPM" : "PDP";
@@ -918,6 +920,7 @@
 
       els.reverseModeButton.addEventListener("click", () => setMode("reverse"));
       els.pdpModeButton.addEventListener("click", () => setMode("requiredPdp"));
+      els.relayModeButton.addEventListener("click", () => setMode("relay"));
 
       ["pdp", "hoseLength", "applianceLoss"].forEach(id => {
         els[id].addEventListener("input", e => handleWholeNumberInput(id, e.target));
@@ -1366,6 +1369,9 @@
     function isRequiredPdpMode() {
       return state.mode === "requiredPdp";
     }
+
+    function isRelayMode() {
+      return state.mode === "relay";
 
     function isSmoothbore() {
       return state.nozzleType === "smoothbore";
