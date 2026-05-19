@@ -185,7 +185,7 @@
     .mode-buttons,
     .pressure-buttons {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -476,6 +476,7 @@
           <div class="mode-buttons">
             <button id="reverseModeButton" type="button">Reverse Flow Mode</button>
             <button id="pdpModeButton" type="button">Required PDP Mode</button>
+            <button id="relayModeButton" type="button">Relay Pumping Mode</button>
           </div>
           <p class="helper" id="modeHelper">Reverse Flow Mode: Enter PDP to estimate GPM and Nozzle Pressure based on hose and nozzle characteristics.</p>
         </div>
