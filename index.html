@@ -422,19 +422,6 @@ button:active:not(:disabled) {
       line-height: 1.1;
       margin-top: 4px;
     }
-      .form-grid,
-.result-top,
-.result-details,
-.formula {
-  transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
-}
-
-.is-transitioning {
-  opacity: 0.65;
-  transform: translateY(2px);
-}
     /* ---------- Results ---------- */
     .result-top {
   background: var(--dark);
@@ -1554,8 +1541,6 @@ document.addEventListener("keydown", event => {
 
     function setMode(mode) {
       
-    document.body.classList.add("is-transitioning");
-      
   state.mode = mode;
 
   // ========================================
@@ -1608,10 +1593,6 @@ document.addEventListener("keydown", event => {
 
   renderPressureButtons();
   calculateAndRender();
-
-      setTimeout(() => {
-  document.body.classList.remove("is-transitioning");
-}, 180);
 }
 
     function resetCalculator() {
