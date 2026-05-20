@@ -645,13 +645,83 @@ Dual 3” = 0.4,
   ========================================= -->
   <script>
     // ========================================
-    // APP CONFIG
-    // ========================================
-    const APP_VERSION = "3.4.0-beta-relay";
-    const STORAGE_KEY = "reverse-flow-calculator-v3";
-    const PRESETS_KEY = "reverse-flow-calculator-presets-v1";
+// APP CONFIG
+// ========================================
 
-    console.log(`Reverse Flow Calculator v${APP_VERSION}`);
+const APP_VERSION = "3.5.0-beta-pro-framework";
+
+const STORAGE_KEY = "reverse-flow-calculator-v3";
+const PRESETS_KEY = "reverse-flow-calculator-presets-v1";
+
+// ========================================
+// ACCESS CONTROL
+// ========================================
+
+const ACCESS_LEVELS = {
+  BASIC: "basic",
+  PRO: "pro",
+  PRO_COMPED: "pro_comped"
+};
+
+// Beta testers default to PRO access for now
+let userAccessLevel = ACCESS_LEVELS.PRO_COMPED;
+
+function isProUser() {
+  return (
+    userAccessLevel === ACCESS_LEVELS.PRO ||
+    userAccessLevel === ACCESS_LEVELS.PRO_COMPED
+  );
+}
+
+// ========================================
+// FEATURE DEFINITIONS
+// ========================================
+
+const FEATURES = {
+  reverseFlow: {
+    name: "Reverse Flow",
+    access: ACCESS_LEVELS.BASIC
+  },
+
+  requiredPdp: {
+    name: "Required PDP",
+    access: ACCESS_LEVELS.BASIC
+  },
+
+  relayPumping: {
+    name: "Relay Pumping",
+    access: ACCESS_LEVELS.BASIC
+  },
+
+  splitLay: {
+    name: "Split Lay",
+    access: ACCESS_LEVELS.PRO
+  },
+
+  equipmentCatalog: {
+    name: "Equipment Catalog",
+    access: ACCESS_LEVELS.PRO
+  },
+
+  departmentProfiles: {
+    name: "Department Profiles",
+    access: ACCESS_LEVELS.PRO
+  }
+};
+
+function canAccessFeature(featureKey) {
+  const feature = FEATURES[featureKey];
+
+  if (!feature) return false;
+
+  if (feature.access === ACCESS_LEVELS.BASIC) {
+    return true;
+  }
+
+  return isProUser();
+}
+
+console.log(`Reverse Flow Calculator v${APP_VERSION}`);
 
     // ========================================
     // HYDRAULIC DATA
