@@ -453,10 +453,13 @@
          APP HEADER
     ========================================= -->
     <header>
-      <div class="badge-row">
-        <div class="badge">Training Calculator</div>
-        <div class="badge beta">BETA</div>
-      </div>
+     <div class="badge-row">
+  <div class="badge">Hydraulic Operations Platform</div>
+
+  <div class="badge beta" id="accessBadge">
+    PRO BETA ACCESS
+  </div>
+</div> 
 
       <h1>Reverse Flow</h1>
       <p class="subtitle">All-in-One Hydraulic Application for the fire service.</p>
@@ -839,6 +842,25 @@ console.log(`Reverse Flow Calculator v${APP_VERSION}`);
 
     function init() {
       els.versionFooter.textContent = `Reverse Flow Calculator v${APP_VERSION}`;
+      updateAccessBadge();
+      function updateAccessBadge() {
+
+  const badge = document.getElementById("accessBadge");
+
+  if (!badge) return;
+
+  if (userAccessLevel === ACCESS_LEVELS.PRO_COMPED) {
+    badge.textContent = "PRO BETA ACCESS";
+    return;
+  }
+
+  if (userAccessLevel === ACCESS_LEVELS.PRO) {
+    badge.textContent = "PRO";
+    return;
+  }
+
+  badge.textContent = "BASIC VERSION";
+}
 
       populateHoseOptions();
       populateSmoothboreTips();
