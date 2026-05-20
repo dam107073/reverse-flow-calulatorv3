@@ -196,6 +196,17 @@ button:active:not(:disabled) {
       color: var(--muted);
       margin: 0;
     }
+    .section-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--border),
+    transparent
+  );
+  margin: 4px 0;
+}
 
     .mode-buttons,
     .pressure-buttons {
@@ -594,6 +605,7 @@ Select a hydraulic calculation mode.
   <span>COMING SOON</span>
 </div>
           <p class="helper" id="modeHelper">Reverse Flow Mode: Enter PDP to estimate GPM and Nozzle Pressure based on hose and nozzle characteristics.</p>
+          <div class="section-divider">
         </div>
 
         <div class="field">
@@ -637,6 +649,8 @@ Select a hydraulic calculation mode.
           <div id="disabledPressureExplanations" class="disabled-explanations" hidden></div>
         </div>
 
+         <div class="section-divider"></div>
+          
         <div class="field">
           <label for="applianceLoss">Appliance / Elevation Loss</label>
           <input id="applianceLoss" inputmode="numeric" placeholder="0" />
