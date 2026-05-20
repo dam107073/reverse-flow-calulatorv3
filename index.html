@@ -1200,7 +1200,16 @@ function updateAccessBadge() {
     }
 
     function renderPressureButtons() {
-      if (isRelayMode()) {
+  if (isSplitLayMode()) {
+    els.nozzlePressureLabel.closest(".field").style.display = "none";
+    els.pressureButtons.hidden = true;
+    els.pressureButtons.innerHTML = "";
+    els.calculatedNozzlePressure.hidden = true;
+    els.disabledPressureExplanations.hidden = true;
+    return;
+  }
+
+  if (isRelayMode()) {
   els.nozzlePressureLabel.closest(".field").style.display = "none";
   els.pressureButtons.hidden = true;
   els.pressureButtons.innerHTML = "";
