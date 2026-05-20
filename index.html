@@ -774,6 +774,18 @@ Select a hydraulic calculation mode.
     <option value="100">100 psi</option>
   </select>
 </div>
+    <div
+  class="field"
+  id="splitAttackFlowField"
+>
+  <label>Target Attack Flow</label>
+
+  <input
+    id="splitAttackFlow"
+    inputmode="numeric"
+    placeholder="GPM"
+  />
+</div>
 
 <div
   class="field"
@@ -1645,6 +1657,7 @@ document.addEventListener("keydown", event => {
 
   const pressureSelect = document.getElementById("splitAttackNozzlePressure");
   const tipField = document.getElementById("splitSmoothboreTipField");
+  const flowField = document.getElementById("splitAttackFlowField");
 
   state.splitLay.attackNozzleType = e.target.value;
 
@@ -1659,6 +1672,7 @@ document.addEventListener("keydown", event => {
     `;
 
     tipField.style.display = "";
+    flowField.style.display = "none";
 
   } else {
 
@@ -1670,6 +1684,7 @@ document.addEventListener("keydown", event => {
     `;
 
     tipField.style.display = "none";
+    flowField.style.display = "";
 
   }
 
@@ -1705,6 +1720,64 @@ document.addEventListener("keydown", event => {
 document.getElementById("splitAttackLines")?.addEventListener("change", e => {
 
   state.splitLay.attackLines = e.target.value;
+
+  saveState();
+
+});
+      document.getElementById("splitSupplyLength")?.addEventListener("input", e => {
+
+  state.splitLay.supplyLength = wholeNumber(e.target.value);
+  e.target.value = state.splitLay.supplyLength;
+
+  saveState();
+
+});
+
+document.getElementById("splitSupplyHose")?.addEventListener("change", e => {
+
+  state.splitLay.supplyHoseSize = e.target.value;
+
+  saveState();
+
+});
+
+document.getElementById("splitAttackLength")?.addEventListener("input", e => {
+
+  state.splitLay.attackLength = wholeNumber(e.target.value);
+  e.target.value = state.splitLay.attackLength;
+
+  saveState();
+
+});
+
+document.getElementById("splitAttackHose")?.addEventListener("change", e => {
+
+  state.splitLay.attackHoseSize = e.target.value;
+
+  saveState();
+
+});
+
+document.getElementById("splitAttackNozzlePressure")?.addEventListener("change", e => {
+
+  state.splitLay.attackNozzlePressure = e.target.value;
+
+  saveState();
+
+});
+
+document.getElementById("splitAttackFlow")?.addEventListener("input", e => {
+
+  state.splitLay.attackFlow = wholeNumber(e.target.value);
+  e.target.value = state.splitLay.attackFlow;
+
+  saveState();
+
+});
+
+document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", e => {
+
+  state.splitLay.attackSmoothboreTip = e.target.value;
 
   saveState();
 
@@ -1912,17 +1985,9 @@ document.getElementById("splitAttackLines")?.addEventListener("change", e => {
       setResult("—", "—", "—", "—", getNozzleDisplay(), getSetupDisplay());
 
       
+      
       if (isSplitLayMode()) {
-  setResult(
-    "—",
-    "PRO Module",
-    "—",
-    "—",
-    "Split Lay",
-    "Awaiting inputs",
-    "—"
-  );
-  renderWarnings([]);
+  calculateSplitLay(warnings);
   return;
 }
 
@@ -2143,6 +2208,145 @@ function calculateRelayPdp({
   );
 
   renderWarnings(warnings);
+}
+    // ========================================
+// SPLIT LAY CALCULATIONS
+// ========================================
+
+function calculateSplitLay(warnings) {
+
+  const supplyLength =
+    numberOrNull(state.splitLay.supplyLength);
+
+  const attackLength =
+    numberOrNull(state.splitLay.attackLength);
+
+  const attackLines =
+    numberOrNull(state.splitLay.attackLines) || 1;
+
+  const applianceLoss =
+    numberOrNull(state.applianceLoss) || 0;
+
+  const supplyHose =
+    HOSE_OPTIONS.find(
+      hose => hose.id === state.splitLay.supplyHoseSize
+    );
+
+  const attackHose =
+    HOSE_OPTIONS.find(
+      hose => hose.id === state.splitLay.attackHoseSize
+    );
+
+  if (
+    !supplyHose ||
+    !attackHose ||
+    supplyLength === null ||
+    attackLength === null
+  ) {
+    renderWarnings(warnings);
+    return;
+  }
+
+  let attackFlow = 0;
+
+  // ========================================
+  // FOG NOZZLE FLOW
+  // ========================================
+
+  if (state.splitLay.attackNozzleType === "fog") {
+
+    attackFlow =
+      numberOrNull(state.splitLay.attackFlow);
+
+    if (!attackFlow) {
+      warnings.push("Enter target attack flow.");
+      renderWarnings(warnings);
+      return;
+    }
+
+  }
+
+  // ========================================
+  // SMOOTHBORE FLOW
+  // ========================================
+
+  else {
+
+    const tip =
+      SMOOTHBORE_TIPS.find(
+        item =>
+          item.id === state.splitLay.attackSmoothboreTip
+      );
+
+    const nozzlePressure =
+      numberOrNull(
+        state.splitLay.attackNozzlePressure
+      );
+
+    if (!tip || nozzlePressure === null) {
+      warnings.push("Select smoothbore tip and nozzle pressure.");
+      renderWarnings(warnings);
+      return;
+    }
+
+    attackFlow = smoothboreGpm(
+      tip.diameter,
+      nozzlePressure
+    );
+
+  }
+
+  const nozzlePressure =
+    numberOrNull(
+      state.splitLay.attackNozzlePressure
+    ) || 0;
+
+  const attackQ = attackFlow / 100;
+
+  const attackFlPer100 =
+    attackHose.coefficient *
+    attackQ *
+    attackQ;
+
+  const attackTotalFl =
+    attackFlPer100 *
+    (attackLength / 100);
+
+  const totalSupplyFlow =
+    attackFlow * attackLines;
+
+  const supplyQ =
+    totalSupplyFlow / 100;
+
+  const supplyFlPer100 =
+    supplyHose.coefficient *
+    supplyQ *
+    supplyQ;
+
+  const supplyTotalFl =
+    supplyFlPer100 *
+    (supplyLength / 100);
+
+  const totalPdp =
+    nozzlePressure +
+    attackTotalFl +
+    supplyTotalFl +
+    applianceLoss;
+
+  setResult(
+    Math.round(totalPdp),
+    `${Math.round(totalSupplyFlow)} GPM`,
+    `${Math.round(
+      attackTotalFl + supplyTotalFl
+    )} psi`,
+    `${Math.round(supplyFlPer100)} psi`,
+    `${Math.round(attackFlow)} GPM / line`,
+    `${attackLines} Attack Line(s)`,
+    "—"
+  );
+
+  renderWarnings(warnings);
+
 }
     // ========================================
     // VALIDATION
