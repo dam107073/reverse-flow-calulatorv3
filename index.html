@@ -209,12 +209,19 @@ button:active:not(:disabled) {
 }
 
     .mode-buttons,
-    .pressure-buttons {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      padding-top: 4px;
-    }
+.pressure-buttons {
+  display: grid;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.mode-buttons {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pressure-buttons {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
     .mode-buttons button {
   padding: 12px 14px;
@@ -229,7 +236,12 @@ button:active:not(:disabled) {
     .mode-card-pro {
   position: relative;
   overflow: hidden;
+  opacity: 0.78;
+  border-style: dashed;
 }
+  .mode-card-pro:hover {
+  opacity: 1;
+}  
 
 .mode-card-pro::after {
   content: "PRO";
@@ -294,10 +306,24 @@ button:active:not(:disabled) {
   width: min(460px, 100%);
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 24px;
+  border-radius: 28px;
+  padding: 28px;
   box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+  position: relative;
+  overflow: hidden;
 }
+  .pro-modal-content::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(251, 146, 60, 0.14),
+      transparent 38%
+    );
+  pointer-events: none;
+}  
 
 .pro-modal-header {
   display: flex;
@@ -305,11 +331,21 @@ button:active:not(:disabled) {
   align-items: center;
   gap: 12px;
 }
+    .modal-close-button {
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 900;
+  padding: 0;
+}
 
 .pro-modal-header h2 {
   margin: 0;
-  font-size: 28px;
-  letter-spacing: -0.04em;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.05em;
 }
 
 .pro-modal-subtitle {
@@ -319,9 +355,16 @@ button:active:not(:disabled) {
 
 .pro-feature-list {
   display: grid;
-  gap: 12px;
-  margin-bottom: 20px;
-  font-weight: 700;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.pro-feature-list div {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.03);
+  font-weight: 750;
 }
 
 .pro-modal-footer {
@@ -682,15 +725,6 @@ Select a hydraulic calculation mode.
     Split Lay Mode
   </button>
 </div>
-
-          <div class="pro-preview">
-  <div>
-    <strong>Advanced PRO Modules</strong>
-    <p>Split Lay • Equipment Catalogs • Department Profiles</p>
-  </div>
-
-  <span>COMING SOON</span>
-</div>
           <p class="helper" id="modeHelper">Reverse Flow Mode: Enter PDP to estimate GPM and Nozzle Pressure based on hose and nozzle characteristics.</p>
           <div class="section-divider">
         </div>
@@ -852,10 +886,13 @@ Dual 3” = 0.4,
   <div class="pro-modal-content">
 
     <div class="pro-modal-header">
+     <div class="badge beta">
+  PRO ACCESS
+</div> 
       <h2>Reverse Flow PRO</h2>
-      <button id="closeProModal" class="small-button" type="button">
-        Close
-      </button>
+      <button id="closeProModal" class="modal-close-button" type="button">
+  ✕
+</button>
     </div>
 
     <p class="pro-modal-subtitle">
@@ -865,14 +902,14 @@ Dual 3” = 0.4,
     <div class="pro-feature-list">
       <div>✓ Split Lay Calculations</div>
       <div>✓ Equipment Catalog Profiles</div>
-      <div>✓ Department Pump Packages</div>
       <div>✓ Advanced Relay Operations</div>
       <div>✓ Future Module Access</div>
     </div>
 
     <div class="pro-modal-footer">
-      One-time purchase. No subscription.
-    </div>
+  <strong>One-time purchase.</strong>
+  No subscription. Lifetime access to all future PRO modules.
+</div>
 
   </div>
 </div>
@@ -1393,14 +1430,27 @@ els.nozzlePressureLabel.closest(".field").style.display = isRelayMode() ? "none"
       els.resetButton.addEventListener("click", resetCalculator);
 
       els.reverseModeButton.addEventListener("click", () => setMode("reverse"));
-      els.pdpModeButton.addEventListener("click", () => setMode("requiredPdp"));
-      els.relayModeButton.addEventListener("click", () => setMode("relay"));
-      els.splitLayButton.addEventListener("click", () => {
+els.pdpModeButton.addEventListener("click", () => setMode("requiredPdp"));
+els.relayModeButton.addEventListener("click", () => setMode("relay"));
+
+els.splitLayButton.addEventListener("click", () => {
   els.proModal.hidden = false;
 });
 
 els.closeProModal.addEventListener("click", () => {
   els.proModal.hidden = true;
+});
+
+els.proModal.addEventListener("click", event => {
+  if (event.target === els.proModal) {
+    els.proModal.hidden = true;
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    els.proModal.hidden = true;
+  }
 });
 
       ["pdp", "hoseLength", "applianceLoss"].forEach(id => {
