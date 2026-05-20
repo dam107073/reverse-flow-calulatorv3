@@ -700,6 +700,15 @@ Select a hydraulic calculation mode.
           <div class="section-divider">
         </div>
 
+          <div id="splitLayFields" class="field full" hidden>
+  <div class="split-lay-panel">
+    <strong>Split Lay Setup</strong>
+    <p class="helper">
+      Configure supply hose, appliance, and attack line sections.
+    </p>
+  </div>
+</div>
+          
         <div class="field">
           <label for="pdp" id="pdpLabel">Pump Discharge Pressure</label>
           <input id="pdp" inputmode="numeric" placeholder="PDP" />
@@ -1426,6 +1435,12 @@ els.nozzleTypeLabel.textContent = isRelayMode()
 }
 
 els.nozzlePressureLabel.closest(".field").style.display = isRelayMode() ? "none" : "";
+
+    const splitLayFields = document.getElementById("splitLayFields");
+
+if (splitLayFields) {
+  splitLayFields.hidden = !isSplitLayMode();
+}  
 
     }
 
