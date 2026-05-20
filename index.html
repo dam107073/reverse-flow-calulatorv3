@@ -406,12 +406,12 @@ button:active:not(:disabled) {
   position: absolute;
   inset: 0;
   background:
-    
     radial-gradient(
       circle at top right,
       var(--mode-glow),
-      transparent 40%
+      transparent 58%
     );
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -1312,21 +1312,21 @@ document.querySelector('label[for="applianceLoss"]').textContent =
 
   document.documentElement.style.setProperty(
     "--mode-glow",
-    "rgba(59, 130, 246, 0.20)"
+    "rgba(59, 130, 246, 0.38)"
   );
 
 } else if (isRequiredPdpMode()) {
 
   document.documentElement.style.setProperty(
     "--mode-glow",
-    "rgba(34, 197, 94, 0.20)"
+    "rgba(34, 197, 94, 0.36)"
   );
 
 } else {
 
   document.documentElement.style.setProperty(
     "--mode-glow",
-    "rgba(234, 88, 12, 0.18)"
+    "rgba(234, 88, 12, 0.38)"
   );
 
 }
