@@ -30,6 +30,8 @@
       --border: #dbe3ee;
       --dark: #020617;
       --accent: #ea580c;
+      --mode-accent: #ea580c;
+      --mode-glow: rgba(234, 88, 12, 0.18);
       --warning-bg: #fef3c7;
       --warning-border: #f59e0b;
       --warning-text: #78350f;
@@ -256,37 +258,6 @@ button:active:not(:disabled) {
   padding: 3px 6px;
   border-radius: 999px;
 }
-    .pro-preview {
-  margin-top: 12px;
-  padding: 14px 16px;
-  border: 1px dashed var(--border);
-  border-radius: 16px;
-  background: rgba(234, 88, 12, 0.06);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.pro-preview strong {
-  display: block;
-  font-size: 14px;
-}
-
-.pro-preview p {
-  margin: 3px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 650;
-}
-
-.pro-preview span {
-  flex-shrink: 0;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-}
     .pro-modal {
   position: fixed;
   inset: 0;
@@ -437,7 +408,7 @@ button:active:not(:disabled) {
   background:
     radial-gradient(
       circle at top right,
-      rgba(251, 146, 60, 0.18),
+      var(--mode-glow)
       transparent 40%
     );
   pointer-events: none;
@@ -880,8 +851,8 @@ Select a hydraulic calculation mode.
       <details class="about">
         <summary>About / How to Use</summary>
         <p><strong>Reverse Flow Mode</strong> Estimates GPM by working backwards using PDP, Nozzle Pressure, and Friction Loss.</p>
-        <p><strong>Required PDP Mode</strong> Calculates the pump discharge pressure needed to achieve a target GPM.
-        </p><strong>Relay Pumping Mode</strong> Calculates the required PDP for a relay pumper to supply a receiving unit with specific target flow.
+        <p><strong>Required PDP Mode</strong> Calculates the pump discharge pressure needed to achieve a target GPM.</p>
+        </p><strong>Relay Pumping Mode</strong> Calculates the required PDP for a relay pumper to supply a receiving unit with specific target flow.</p>
         <p>For smoothbore calculations, select the tip size manually when in PDP mode. Smoothbore nozzle pressures will be calculated automatically in Reverse Flow mode.</p>
         <p>This calculator is intended for training and reference. Always follow local pump charts, equipment testing, department policy, and instructor guidance.</p>
       </details>
@@ -1336,7 +1307,28 @@ document.querySelector('label[for="hoseSize"]').textContent =
 
 document.querySelector('label[for="applianceLoss"]').textContent =
   isRelayMode() ? "Appliance / Elevation / Intake Loss" : "Appliance / Elevation Loss";
+    if (isRelayMode()) {
 
+  document.documentElement.style.setProperty(
+    "--mode-glow",
+    "rgba(59, 130, 246, 0.20)"
+  );
+
+} else if (isRequiredPdpMode()) {
+
+  document.documentElement.style.setProperty(
+    "--mode-glow",
+    "rgba(34, 197, 94, 0.20)"
+  );
+
+} else {
+
+  document.documentElement.style.setProperty(
+    "--mode-glow",
+    "rgba(234, 88, 12, 0.18)"
+  );
+
+}
     els.modeHelper.textContent = isRelayMode()
   ? "Relay Pumping: calculate the discharge pressure needed to supply a receiving engine."
   : smoothboreRequiredPdp
