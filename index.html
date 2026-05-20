@@ -1289,6 +1289,7 @@ function updateAccessBadge() {
       els.reverseModeButton.classList.toggle("active", isReverseMode());
       els.pdpModeButton.classList.toggle("active", isRequiredPdpMode());
       els.relayModeButton.classList.toggle("active",isRelayMode());
+      els.splitLayButton.classList.toggle("active", isSplitLayMode());
 
       els.pdpLabel.textContent =
         isRelayMode()
@@ -1319,7 +1320,14 @@ document.querySelector('label[for="hoseSize"]').textContent =
 
 document.querySelector('label[for="applianceLoss"]').textContent =
   isRelayMode() ? "Appliance / Elevation / Intake Loss" : "Appliance / Elevation Loss";
-    if (isRelayMode()) {
+    if (isSplitLayMode()) {
+
+  document.documentElement.style.setProperty(
+    "--mode-glow",
+    "rgba(168, 85, 247, 0.38)"
+  );
+
+} else if (isRelayMode()) {
 
   document.documentElement.style.setProperty(
     "--mode-glow",
@@ -1341,24 +1349,29 @@ document.querySelector('label[for="applianceLoss"]').textContent =
   );
 
 }
-    els.modeHelper.textContent = isRelayMode()
-  ? "Relay Pumping: calculate the discharge pressure needed to supply a receiving engine."
-  : smoothboreRequiredPdp
-    ? "Required PDP: smoothbore target flow is calculated from tip size and nozzle pressure."
-    : isRequiredPdpMode()
-      ? "Required PDP: enter target GPM to calculate the needed pump pressure."
-      : "Reverse Flow: enter PDP to estimate GPM.";
+    els.modeHelper.textContent = isSplitLayMode()
+  ? "Split Lay: calculate staged hose layouts with supply hose, appliance, and attack line sections."
+  : isRelayMode()
+    ? "Relay Pumping: calculate the discharge pressure needed to supply a receiving engine."
+    : smoothboreRequiredPdp
+      ? "Required PDP: smoothbore target flow is calculated from tip size and nozzle pressure."
+      : isRequiredPdpMode()
+        ? "Required PDP: enter target GPM to calculate the needed pump pressure."
+        : "Reverse Flow: enter PDP to estimate GPM.";
 
       els.reverseFormula.hidden = !isReverseMode();
       els.requiredPdpFormula.hidden = !isRequiredPdpMode();
       els.relayFormula.hidden = !isRelayMode();
 
       els.primaryResultLabel.textContent =
-  isRelayMode()
-    ? "Relay PDP"
-    : isRequiredPdpMode()
-      ? "Required PDP"
-      : "Rounded Flow";
+  isSplitLayMode()
+    ? "Split Lay PDP"
+    : isRelayMode()
+      ? "Relay PDP"
+      : isRequiredPdpMode()
+        ? "Required PDP"
+        : "Rounded Flow";
+      
       els.primaryResultUnit.textContent =
   isRelayMode() || isRequiredPdpMode()
     ? "PSI"
