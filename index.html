@@ -53,10 +53,10 @@
     }
 
     main {
-      width: min(920px, 100%);
-      margin: 0 auto;
-      padding: 24px 16px 40px;
-    }
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 0 16px 40px;
+}
 
     h1 {
       font-size: clamp(32px, 6vw, 48px);
@@ -133,6 +133,49 @@ button:active:not(:disabled) {
     }
 
     /* ---------- Header ---------- */
+   .app-header {
+  width: calc(100% + 32px);
+  margin: -24px -16px 24px;
+  background: #081225;
+  color: #ffffff;
+  padding: 24px 20px 26px;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.app-header-inner {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.app-header-kicker {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.72;
+  margin-bottom: 12px;
+}
+
+.app-header-title {
+  color: #ffffff;
+  font-size: clamp(42px, 8vw, 64px);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  margin: 0;
+  font-weight: 850;
+}
+
+.app-header-subtitle {
+  color: rgba(255,255,255,0.72);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  max-width: 720px;
+  margin: 12px auto 0 auto;
+  text-align: center;
+}
     .badge-row {
       display: flex;
       gap: 10px;
@@ -642,18 +685,16 @@ button:active:not(:disabled) {
     <!-- ========================================
          APP HEADER
     ========================================= -->
-    <header>
-     <div class="badge-row">
-  <div class="badge">Hydraulic Operations Calculators</div>
-
-  <div class="badge beta" id="accessBadge">
-    PRO BETA ACCESS
+    <header class="app-header">
+  <div class="app-header-inner">
+    <div>
+      <h1 class="app-header-title">REVERSE FLOW</h1>
+      <p class="app-header-subtitle">
+        Hydraulic flow and pump pressure calculations for fireground operations and training.
+      </p>
+    </div>
   </div>
-</div> 
-
-      <h1>Reverse Flow</h1>
-      <p class="subtitle">Hydraulic flow and pump pressure calculations for fireground operations and training.</p>
-    </header>
+</header>
 
     <!-- ========================================
          CALCULATOR INPUTS
