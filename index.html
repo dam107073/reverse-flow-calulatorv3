@@ -2000,29 +2000,32 @@ document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", 
     }
 
     function applyPreset(presetId) {
-      if (!presetId) return;
+  if (!presetId) return;
 
-      const presets = loadPresets();
-      const preset = presets.find(item => item.id === presetId);
-      if (!preset) return;
+  const presets = loadPresets();
+  const preset = presets.find(item => item.id === presetId);
+  if (!preset) return;
 
-      state = {
-        ...state,
-        hoseLength: preset.hoseLength || "",
-        hoseSize: preset.hoseSize || "",
-        nozzleType: preset.nozzleType || "",
-        nozzlePressure: preset.nozzlePressure || "",
-        smoothboreTip: preset.smoothboreTip || "",
-        applianceLoss: preset.applianceLoss || "0",
-        useCustomCoefficient: preset.useCustomCoefficient || false,
-        customCoefficient: preset.customCoefficient || "",
-      };
+  state = {
+    ...state,
+    hoseLength: preset.hoseLength || "",
+    hoseSize: preset.hoseSize || "1.88",
+    nozzleType: preset.nozzleType || "fog",
+    nozzlePressure: preset.nozzlePressure || "55",
+    smoothboreTip: preset.smoothboreTip || "",
+    applianceLoss: preset.applianceLoss || "0",
+    useCustomCoefficient: preset.useCustomCoefficient || false,
+    customCoefficient: preset.customCoefficient || "",
+  };
 
-      saveState();
-      syncInputsFromState();
-      renderPressureButtons();
-      calculateAndRender();
-    }
+  populateHoseOptions();
+  saveState();
+  syncInputsFromState();
+  syncSmoothboreUi();
+  syncModeUi();
+  renderPressureButtons();
+  calculateAndRender();
+}
 
     function deleteSelectedPreset() {
       const selectedId = els.presetSelect.value;
