@@ -1901,20 +1901,7 @@ document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", 
   // STANDARD CALCULATOR DEFAULTS
   // ========================================
   if (mode !== "splitLay") {
-
-  state.splitLay = {
-    ...DEFAULT_STATE.splitLay
-  };
-
-  [
-    "splitSupplyLength",
-    "splitAttackLength",
-    "splitAttackFlow"
-  ].forEach(id => {
-    const input = document.getElementById(id);
-    if (input) input.value = "";
-  });
-
+  resetSplitLayInputs();
 }
       
   if (mode === "reverse" || mode === "requiredPdp") {
@@ -2619,6 +2606,56 @@ if (state.splitLay.appliance === "standpipe") {
       return isReverseMode() && isSmoothbore();
     }
 
+    // ========================================
+// SPLIT LAY RESET
+// ========================================
+
+function resetSplitLayInputs() {
+
+  state.splitLay = {
+    ...DEFAULT_STATE.splitLay
+  };
+
+  const fields = {
+    splitSupplyLength: "",
+    splitSupplyHose: DEFAULT_STATE.splitLay.supplyHoseSize,
+    splitAppliance: DEFAULT_STATE.splitLay.appliance,
+    splitAttackLines: DEFAULT_STATE.splitLay.attackLines,
+    splitAttackLength: "",
+    splitAttackHose: DEFAULT_STATE.splitLay.attackHoseSize,
+    splitAttackNozzleType: DEFAULT_STATE.splitLay.attackNozzleType,
+    splitAttackNozzlePressure: DEFAULT_STATE.splitLay.attackNozzlePressure,
+    splitAttackFlow: "",
+    splitAttackSmoothboreTip: DEFAULT_STATE.splitLay.attackSmoothboreTip
+  };
+
+  Object.entries(fields).forEach(([id, value]) => {
+
+    const el = document.getElementById(id);
+
+    if (el) {
+      el.value = value;
+    }
+
+  });
+
+  const splitTipField =
+    document.getElementById("splitSmoothboreTipField");
+
+  const splitFlowField =
+    document.getElementById("splitAttackFlowField");
+
+  if (splitTipField) {
+    splitTipField.hidden = true;
+    splitTipField.style.display = "none";
+  }
+
+  if (splitFlowField) {
+    splitFlowField.style.display = "";
+  }
+
+}
+    
     // ========================================
     // GENERAL UTILITIES
     // ========================================
