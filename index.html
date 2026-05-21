@@ -2394,6 +2394,15 @@ if (
 if (state.splitLay.appliance === "standpipe") {
   automaticApplianceLoss = 25;
 }
+  if (automaticApplianceLoss > 0) {
+
+  warnings.push(
+    `${automaticApplianceLoss} psi automatic appliance loss added for ${state.splitLay.appliance === "standpipe"
+      ? "standpipe operations"
+      : "flow greater than 350 GPM"}`
+  );
+
+}
 
   const supplyQ =
     totalSupplyFlow / 100;
