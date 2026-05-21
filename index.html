@@ -700,7 +700,8 @@ Select a hydraulic calculation mode.
           <div class="section-divider">
         </div>
 
-          <div class="split-lay-panel">
+          <div id="splitLayFields" class="field full" hidden>
+  <div class="split-lay-panel">
 
   <strong>Split Lay Setup</strong>
 
@@ -805,11 +806,12 @@ Select a hydraulic calculation mode.
   </select>
 </div>
 
-  </div>
+   </div>
 
+  </div>
 </div>
           
-        <div class="field">
+<div class="field">
           <label for="pdp" id="pdpLabel">Pump Discharge Pressure</label>
           <input id="pdp" inputmode="numeric" placeholder="PDP" />
         </div>
@@ -1554,7 +1556,7 @@ if (splitLayFields) {
 
     function syncSmoothboreUi() {
 
-  if (isRelayMode()) {
+  if (isRelayMode() || isSplitLayMode()) {
     els.smoothboreTipField.hidden = true;
     els.smoothboreTipField.style.display = "none";
     return;
@@ -1673,16 +1675,21 @@ document.addEventListener("keydown", event => {
 
   if (e.target.value === "smoothbore") {
 
-    pressureSelect.innerHTML = `
-      <option value="40">40 psi</option>
-      <option value="50">50 psi</option>
-      <option value="60">60 psi</option>
-    `;
+  pressureSelect.innerHTML = `
+    <option value="40">40 psi</option>
+    <option value="50">50 psi</option>
+    <option value="60">60 psi</option>
+  `;
 
-    tipField.style.display = "";
-    flowField.style.display = "none";
+  state.splitLay.attackNozzlePressure = "50";
+  pressureSelect.value = "50";
 
-  } else {
+  tipField.hidden = false;
+  tipField.style.display = "";
+
+  flowField.style.display = "none";
+
+} else {
 
   pressureSelect.innerHTML = `
     <option value="50">50 psi</option>
@@ -1690,6 +1697,9 @@ document.addEventListener("keydown", event => {
     <option value="75">75 psi</option>
     <option value="100">100 psi</option>
   `;
+
+  state.splitLay.attackNozzlePressure = "50";
+  pressureSelect.value = "50";
 
   tipField.hidden = true;
   tipField.style.display = "none";
@@ -1699,6 +1709,7 @@ document.addEventListener("keydown", event => {
 }
 
   saveState();
+  calculateAndRender();
 
 });
 
@@ -1724,6 +1735,7 @@ document.addEventListener("keydown", event => {
   }
 
   saveState();
+  calculateAndRender();
 
 });
 
@@ -1732,6 +1744,7 @@ document.getElementById("splitAttackLines")?.addEventListener("change", e => {
   state.splitLay.attackLines = e.target.value;
 
   saveState();
+  calculateAndRender();
 
 });
       document.getElementById("splitSupplyLength")?.addEventListener("input", e => {
@@ -1740,6 +1753,7 @@ document.getElementById("splitAttackLines")?.addEventListener("change", e => {
   e.target.value = state.splitLay.supplyLength;
 
   saveState();
+  calculateAndRender();
 
 });
 
@@ -1748,6 +1762,7 @@ document.getElementById("splitSupplyHose")?.addEventListener("change", e => {
   state.splitLay.supplyHoseSize = e.target.value;
 
   saveState();
+  calculateAndRender();
 
 });
 
@@ -1757,6 +1772,7 @@ document.getElementById("splitAttackLength")?.addEventListener("input", e => {
   e.target.value = state.splitLay.attackLength;
 
   saveState();
+  calculateAndRender();
 
 });
 
@@ -1765,6 +1781,7 @@ document.getElementById("splitAttackHose")?.addEventListener("change", e => {
   state.splitLay.attackHoseSize = e.target.value;
 
   saveState();
+  calculateAndRender();
 
 });
 
@@ -1773,6 +1790,7 @@ document.getElementById("splitAttackNozzlePressure")?.addEventListener("change",
   state.splitLay.attackNozzlePressure = e.target.value;
 
   saveState();
+  calculateAndRender();
 
 });
 
@@ -1782,6 +1800,7 @@ document.getElementById("splitAttackFlow")?.addEventListener("input", e => {
   e.target.value = state.splitLay.attackFlow;
 
   saveState();
+  calculateAndRender();
 
 });
 
@@ -1790,6 +1809,7 @@ document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", 
   state.splitLay.attackSmoothboreTip = e.target.value;
 
   saveState();
+  calculateAndRender();
 
 });
 
