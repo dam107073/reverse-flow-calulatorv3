@@ -1430,7 +1430,11 @@ function updateAccessBadge() {
       els.pdp.closest(".field").style.display = isSplitLayMode() ? "none" : "";
       els.hoseLength.closest(".field").style.display = isSplitLayMode() ? "none" : "";
       els.hoseSize.closest(".field").style.display = isSplitLayMode() ? "none" : "";
-      els.nozzleType.closest(".field").style.display = isSplitLayMode() ? "none" : "";
+      
+      els.nozzleType.closest(".field").style.display =
+  (isSplitLayMode() || isRelayMode())
+    ? "none"
+    : "";
       els.applianceLoss.closest(".field").style.display = "";
       els.customCoefficient.closest(".field").style.display = isSplitLayMode() ? "none" : "";
 
@@ -1525,6 +1529,9 @@ document.querySelector('label[for="applianceLoss"]').textContent =
 
 } 
     els.nozzleType.closest(".field").style.display =
+  (isSplitLayMode() || isRelayMode())
+    ? "none"
+    : "";
   isSplitLayMode() ? "none" : "";
 els.nozzleTypeLabel.textContent = isRelayMode()
   ? "Receiving Engine Residual"
@@ -1544,7 +1551,10 @@ els.nozzleTypeLabel.textContent = isRelayMode()
   els.nozzleType.value = state.nozzleType;
 }
 
-els.nozzlePressureLabel.closest(".field").style.display = isRelayMode() ? "none" : "";
+els.nozzlePressureLabel.closest(".field").style.display =
+  (isRelayMode() || isSplitLayMode())
+    ? "none"
+    : "";
 
     const splitLayFields = document.getElementById("splitLayFields");
 
