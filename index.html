@@ -1522,7 +1522,8 @@ document.querySelector('label[for="applianceLoss"]').textContent =
   els.nozzleReaction.parentElement.style.display = "";
 
 } 
-    els.nozzleType.closest(".field").style.display = "";
+    els.nozzleType.closest(".field").style.display =
+  isSplitLayMode() ? "none" : "";
 els.nozzleTypeLabel.textContent = isRelayMode()
   ? "Receiving Engine Residual"
   : "Nozzle Type";
@@ -2231,7 +2232,7 @@ function calculateSplitLay(warnings) {
     numberOrNull(state.splitLay.attackLength);
 
   const attackLines =
-    numberOrNull(state.splitLay.attackLines) || 1;
+  parseInt(state.splitLay.attackLines, 10) || 1;
 
   const applianceLoss =
     numberOrNull(state.applianceLoss) || 0;
