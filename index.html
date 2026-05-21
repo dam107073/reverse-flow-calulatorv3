@@ -1987,17 +1987,28 @@ document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", 
     }
 
     function buildPresetData() {
-      return {
-        hoseLength: state.hoseLength || "",
-        hoseSize: state.hoseSize || "",
-        nozzleType: state.nozzleType || "",
-        nozzlePressure: state.nozzlePressure || "",
-        smoothboreTip: state.smoothboreTip || "",
-        applianceLoss: state.applianceLoss || "0",
-        useCustomCoefficient: state.useCustomCoefficient || false,
-        customCoefficient: state.customCoefficient || "",
-      };
+  return {
+    mode: state.mode || "reverse",
+
+    hoseLength: state.hoseLength || "",
+    hoseSize: state.hoseSize || "",
+    nozzleType: state.nozzleType || "",
+    nozzlePressure: state.nozzlePressure || "",
+    smoothboreTip: state.smoothboreTip || "",
+
+    applianceLoss: state.applianceLoss || "0",
+
+    useCustomCoefficient:
+      state.useCustomCoefficient || false,
+
+    customCoefficient:
+      state.customCoefficient || "",
+
+    splitLay: {
+      ...state.splitLay
     }
+  };
+}
 
     function applyPreset(presetId) {
   if (!presetId) return;
@@ -2007,20 +2018,68 @@ document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", 
   if (!preset) return;
 
   state = {
-    ...state,
-    hoseLength: preset.hoseLength || "",
-    hoseSize: preset.hoseSize || "1.88",
-    nozzleType: preset.nozzleType || "fog",
-    nozzlePressure: preset.nozzlePressure || "55",
-    smoothboreTip: preset.smoothboreTip || "",
-    applianceLoss: preset.applianceLoss || "0",
-    useCustomCoefficient: preset.useCustomCoefficient || false,
-    customCoefficient: preset.customCoefficient || "",
-  };
+  ...state,
+
+  mode: preset.mode || "reverse",
+
+  hoseLength: preset.hoseLength || "",
+  hoseSize: preset.hoseSize || "1.88",
+
+  nozzleType: preset.nozzleType || "fog",
+
+  nozzlePressure:
+    preset.nozzlePressure || "55",
+
+  smoothboreTip:
+    preset.smoothboreTip || "",
+
+  applianceLoss:
+    preset.applianceLoss || "0",
+
+  useCustomCoefficient:
+    preset.useCustomCoefficient || false,
+
+  customCoefficient:
+    preset.customCoefficient || "",
+
+  splitLay: {
+    ...DEFAULT_STATE.splitLay,
+    ...(preset.splitLay || {})
+  }
+};
 
   populateHoseOptions();
   saveState();
   syncInputsFromState();
+      document.getElementById("splitSupplyLength").value =
+  state.splitLay.supplyLength || "";
+
+document.getElementById("splitSupplyHose").value =
+  state.splitLay.supplyHoseSize || "3";
+
+document.getElementById("splitAppliance").value =
+  state.splitLay.appliance || "gatedWye";
+
+document.getElementById("splitAttackLines").value =
+  state.splitLay.attackLines || "1";
+
+document.getElementById("splitAttackLength").value =
+  state.splitLay.attackLength || "";
+
+document.getElementById("splitAttackHose").value =
+  state.splitLay.attackHoseSize || "1.75";
+
+document.getElementById("splitAttackNozzleType").value =
+  state.splitLay.attackNozzleType || "fog";
+
+document.getElementById("splitAttackNozzlePressure").value =
+  state.splitLay.attackNozzlePressure || "50";
+
+document.getElementById("splitAttackFlow").value =
+  state.splitLay.attackFlow || "";
+
+document.getElementById("splitAttackSmoothboreTip").value =
+  state.splitLay.attackSmoothboreTip || "";
   syncSmoothboreUi();
   syncModeUi();
   renderPressureButtons();
