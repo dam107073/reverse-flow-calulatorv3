@@ -1904,6 +1904,15 @@ document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", 
     ...DEFAULT_STATE.splitLay
   };
 
+  [
+    "splitSupplyLength",
+    "splitAttackLength",
+    "splitAttackFlow"
+  ].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.value = "";
+  });
+
 }
       
   if (mode === "reverse" || mode === "requiredPdp") {
