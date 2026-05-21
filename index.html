@@ -1521,7 +1521,10 @@ document.querySelector('label[for="applianceLoss"]').textContent =
 
   els.calculatedLabel.textContent = "Calculated";
   els.totalFlLabel.textContent = "Total FL";
-  els.flPer100Label.textContent = "FL / 100'";
+  els.flPer100Label.textContent =
+  isSplitLayMode()
+    ? "FL Breakdown"
+    : "FL / 100'";
   els.nozzleDisplayLabel.textContent = "Nozzle";
   els.reactionLabel.textContent = "Reaction";
   els.setupLabel.textContent = "Setup";
