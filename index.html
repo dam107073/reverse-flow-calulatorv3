@@ -723,7 +723,6 @@ Select a hydraulic calculation mode.
   <option value="2.25">2.25"</option>
   <option value="2.5">2.5"</option>
   <option value="3">3"</option>
-  <option value="dual3">Dual 3"</option>
   <option value="4">4"</option>
   <option value="5">5"</option>
 </select>
@@ -1486,13 +1485,13 @@ document.querySelector('label[for="applianceLoss"]').textContent =
 
 }
     els.modeHelper.textContent = isSplitLayMode()
-  ? "Split Lay: calculate staged hose layouts with supply hose, appliance, and attack line sections."
+  ? "Split Lay: Calculate longer deployments using separate supply and attack sections joined by an appliance."
   : isRelayMode()
-    ? "Relay Pumping: calculate the discharge pressure needed to supply a receiving engine."
+    ? "Relay Pumping: Calculate the discharge pressure needed to supply a receiving engine."
     : smoothboreRequiredPdp
-      ? "Required PDP: smoothbore target flow is calculated from tip size and nozzle pressure."
+      ? "Required PDP: Smoothbore target flow is calculated from tip size and nozzle pressure."
       : isRequiredPdpMode()
-        ? "Required PDP: enter target GPM to calculate the needed pump pressure."
+        ? "Required PDP: Enter target GPM to calculate the needed pump pressure."
         : "Reverse Flow: enter PDP to estimate GPM.";
 
       els.reverseFormula.hidden = !isReverseMode();
