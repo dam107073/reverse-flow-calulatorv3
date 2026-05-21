@@ -1559,6 +1559,19 @@ els.nozzlePressureLabel.closest(".field").style.display =
       if (splitLayFields) {
   splitLayFields.style.display = isSplitLayMode() ? "flex" : "none";
 }
+      const splitTipField = document.getElementById("splitSmoothboreTipField");
+const splitFlowField = document.getElementById("splitAttackFlowField");
+const splitNozzleType = document.getElementById("splitAttackNozzleType");
+
+if (splitTipField && splitFlowField && splitNozzleType) {
+  const isSplitSmoothbore =
+    isSplitLayMode() && splitNozzleType.value === "smoothbore";
+
+  splitTipField.hidden = !isSplitSmoothbore;
+  splitTipField.style.display = isSplitSmoothbore ? "" : "none";
+
+  splitFlowField.style.display = isSplitSmoothbore ? "none" : "";
+}
 
 }
 
