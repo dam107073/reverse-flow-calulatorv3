@@ -1555,12 +1555,14 @@ els.nozzlePressureLabel.closest(".field").style.display =
     : "";
 
     const splitLayFields = document.getElementById("splitLayFields");
-    if (splitLayFields) {
-  splitLayFields.hidden = !isSplitLayMode();
-  splitLayFields.style.display = isSplitLayMode() ? "" : "none";
+    
+      if (splitLayFields) {
+  splitLayFields.style.display = isSplitLayMode() ? "flex" : "none";
 }
 
-    function syncSmoothboreUi() {
+}
+
+function syncSmoothboreUi() {
 
   if (isRelayMode() || isSplitLayMode()) {
     els.smoothboreTipField.hidden = true;
