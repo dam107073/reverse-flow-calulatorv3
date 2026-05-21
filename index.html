@@ -2383,18 +2383,43 @@ function calculateSplitLay(warnings) {
     attackTotalFl +
     supplyTotalFl +
     applianceLoss;
+    const nozzleReaction =
+  state.splitLay.attackNozzleType === "smoothbore"
+    ? (() => {
+        const tip = SMOOTHBORE_TIPS.find(
+          item => item.id === state.splitLay.attackSmoothboreTip
+        );
 
+        if (!tip) return "—";
+
+        return `${Math.round(
+          1.57 * tip.diameter * tip.diameter * nozzlePressure
+        )} lb`;
+      })()
+    : `${Math.round(
+        0.0505 * attackFlow * Math.sqrt(nozzlePressure)
+      )} lb`;
+
+  
   setResult(
-    Math.round(totalPdp),
-    `${Math.round(totalSupplyFlow)} GPM`,
-    `${Math.round(
-      attackTotalFl + supplyTotalFl
-    )} psi`,
-    `${Math.round(supplyFlPer100)} psi`,
-    `${Math.round(attackFlow)} GPM / line`,
-    `${attackLines} Attack Line(s)`,
-    "—"
-  );
+  Math.round(totalPdp),
+
+  `${Math.round(totalSupplyFlow)} GPM`,
+
+  `${Math.round(
+    attackTotalFl + supplyTotalFl
+  )} psi total`,
+
+  `${Math.round(supplyTotalFl)} supply / ${Math.round(
+    attackTotalFl
+  )} attack`,
+
+  `${Math.round(attackFlow)} GPM / line`,
+
+  `${attackLines} Attack Line(s)`,
+
+  "nozzleReaction"
+);
 
   renderWarnings(warnings);
 
