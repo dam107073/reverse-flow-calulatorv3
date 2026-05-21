@@ -1946,12 +1946,22 @@ document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", 
 }
 
     function resetCalculator() {
-      state = { ...DEFAULT_STATE };
-      localStorage.removeItem(STORAGE_KEY);
-      syncInputsFromState();
-      renderPressureButtons();
-      calculateAndRender();
-    }
+  state = { ...DEFAULT_STATE };
+  localStorage.removeItem(STORAGE_KEY);
+
+  [
+    "splitSupplyLength",
+    "splitAttackLength",
+    "splitAttackFlow"
+  ].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.value = "";
+  });
+
+  syncInputsFromState();
+  renderPressureButtons();
+  calculateAndRender();
+}
 
     // ========================================
     // PRESETS
