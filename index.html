@@ -1425,6 +1425,13 @@ function updateAccessBadge() {
 
       els.pdp.disabled = smoothboreRequiredPdp;
 
+      els.pdp.closest(".field").style.display = isSplitLayMode() ? "none" : "";
+      els.hoseLength.closest(".field").style.display = isSplitLayMode() ? "none" : "";
+      els.hoseSize.closest(".field").style.display = isSplitLayMode() ? "none" : "";
+      els.nozzleType.closest(".field").style.display = isSplitLayMode() ? "none" : "";
+      els.applianceLoss.closest(".field").style.display = "";
+      els.customCoefficient.closest(".field").style.display = isSplitLayMode() ? "none" : "";
+
       els.pdp.value =
         isRequiredPdpMode()
       ? getTargetFlowValue()
@@ -1676,17 +1683,19 @@ document.addEventListener("keydown", event => {
 
   } else {
 
-    pressureSelect.innerHTML = `
-      <option value="50">50 psi</option>
-      <option value="55">55 psi</option>
-      <option value="75">75 psi</option>
-      <option value="100">100 psi</option>
-    `;
+  pressureSelect.innerHTML = `
+    <option value="50">50 psi</option>
+    <option value="55">55 psi</option>
+    <option value="75">75 psi</option>
+    <option value="100">100 psi</option>
+  `;
 
-    tipField.style.display = "none";
-    flowField.style.display = "";
+  tipField.hidden = true;
+  tipField.style.display = "none";
 
-  }
+  flowField.style.display = "";
+
+}
 
   saveState();
 
