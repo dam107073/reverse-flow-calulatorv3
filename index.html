@@ -1037,7 +1037,7 @@ Select a hydraulic calculation mode.
 // APP CONFIG
 // ========================================
 
-const APP_VERSION = "3.6.2-pro-beta";
+const APP_VERSION = "3.6.3-pro-beta";
     const BUILD_DATE = "2026-05-22";
 
 const STORAGE_KEY = "reverse-flow-calculator-v3";
@@ -2076,7 +2076,6 @@ els.presetSelect.selectedIndex = 0;
 
     function buildPresetData() {
   return {
-    mode: state.mode || "reverse",
 
     hoseLength: state.hoseLength || "",
     hoseSize: state.hoseSize || "",
@@ -2108,15 +2107,10 @@ els.presetSelect.selectedIndex = 0;
   state = {
   ...state,
 
-  mode: preset.mode || state.mode,
-
   hoseLength: preset.hoseLength || "",
-  hoseSize: preset.hoseSize || "1.88",
-
-  nozzleType: preset.nozzleType || "fog",
-
-  nozzlePressure:
-    preset.nozzlePressure || "55",
+  hoseSize: preset.hoseSize || state.hoseSize,
+  nozzleType: preset.nozzleType || state.nozzleType,
+  nozzlePressure: preset.nozzlePressure || state.nozzlePressure,
 
   smoothboreTip:
     preset.smoothboreTip || "",
@@ -2417,8 +2411,8 @@ function calculateRelayPdp({
 
   if (targetGpm > selectedHose.maxReferenceFlow) {
     warnings.push(
-      `Target flow exceeds the reference range for ${selectedHose.chartName}.`
-    );
+  `Target flow is above the normal reference range for ${selectedHose.chartName} hose. Confirm with department-approved flow testing or local operating guidance.`
+);
   }
 
   setResult(
