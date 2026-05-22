@@ -1011,7 +1011,8 @@ Select a hydraulic calculation mode.
 // APP CONFIG
 // ========================================
 
-const APP_VERSION = "3.5.3-pro-beta";
+const APP_VERSION = "3.5.4-pro-beta";
+    const BUILD_DATE = "2026-05-21";
 
 const STORAGE_KEY = "reverse-flow-calculator-v3";
 const PRESETS_KEY = "reverse-flow-calculator-presets-v1";
@@ -1220,7 +1221,8 @@ console.log(`Reverse Flow Calculator v${APP_VERSION}`);
     init();
 
     function init() {
-  els.versionFooter.textContent = `Reverse Flow Calculator v${APP_VERSION}`;
+  els.versionFooter.textContent =
+  `Reverse Flow Calculator v${APP_VERSION} • ${BUILD_DATE}`;
   updateAccessBadge();
 
   populateHoseOptions();
