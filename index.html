@@ -55,7 +55,7 @@
     main {
       width: min(920px, 100%);
       margin: 0 auto;
-      padding: 24px 16px 40px;
+      padding: 20px 16px 40px;
     }
 
     h1 {
@@ -133,40 +133,40 @@ button:active:not(:disabled) {
     }
 
     /* ---------- Header ---------- */
-    .badge-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 18px;
-    }
+    /* ---------- Header ---------- */
+.app-header {
+  width: 100%;
+  background: #081225;
+  color: #ffffff;
+  padding: 24px 20px 26px;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--dark);
-      color: white;
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 14px;
-      font-weight: 600;
-    }
+.app-header-inner {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  text-align: center;
+}
 
-    .beta {
-      background: #06b6d4;
-      color: white;
-      font-size: 12px;
-      padding: 5px 10px;
-      letter-spacing: 0.04em;
-    }
+.app-header-title {
+  color: #ffffff;
+  font-size: clamp(42px, 8vw, 64px);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  margin: 0;
+  font-weight: 850;
+}
 
-    .subtitle {
-      color: var(--muted);
-      max-width: 760px;
-      margin: 0 0 22px;
-      font-size: 16px;
-    }
+.app-header-subtitle {
+  color: rgba(255,255,255,0.72);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  max-width: 720px;
+  margin: 12px auto 0 auto;
+  text-align: center;
+}
 
     /* ---------- Cards / Forms ---------- */
     .card {
@@ -638,22 +638,19 @@ button:active:not(:disabled) {
 </head>
 
 <body>
+  <body>
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div>
+        <h1 class="app-header-title">REVERSE FLOW</h1>
+        <p class="app-header-subtitle">
+          Hydraulic flow and pump pressure calculations for fireground operations and training.
+        </p>
+      </div>
+    </div>
+  </header>
+
   <main>
-    <!-- ========================================
-         APP HEADER
-    ========================================= -->
-    <header>
-     <div class="badge-row">
-  <div class="badge">Hydraulic Operations Platform</div>
-
-  <div class="badge beta" id="accessBadge">
-    PRO BETA ACCESS
-  </div>
-</div> 
-
-      <h1>Reverse Flow</h1>
-      <p class="subtitle">All-in-One Hydraulic Application for the fire service.</p>
-    </header>
 
     <!-- ========================================
          CALCULATOR INPUTS
