@@ -1718,10 +1718,10 @@ document.addEventListener("keydown", event => {
       });
 
       els.hoseSize.addEventListener("change", e => {
-        state.hoseSize = e.target.value;
-        syncCoefficientUi();
-        updateCalculator();
-      });
+  state.hoseSize = e.target.value;
+  clearCustomCoefficient();
+  updateCalculator();
+});
 
       els.nozzleType.addEventListener("change", e => {
   state.nozzleType = e.target.value;
@@ -1929,10 +1929,20 @@ document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", 
       renderPressureButtons();
       calculateAndRender();
     }
+    function clearCustomCoefficient() {
+  state.useCustomCoefficient = false;
+  state.customCoefficient = "";
 
+  if (els.customCoefficient) {
+    els.customCoefficient.value = "";
+  }
+
+  syncCoefficientUi();
+}
     function setMode(mode) {
       
   state.mode = mode;
+  clearCustomCoefficient();
 
   // ========================================
   // RELAY MODE DEFAULTS
@@ -1994,20 +2004,25 @@ els.presetSelect.selectedIndex = 0;
 }
 
     function resetCalculator() {
-  state = { ...DEFAULT_STATE };
+
+  state = {
+    ...DEFAULT_STATE,
+    splitLay: {
+      ...DEFAULT_STATE.splitLay
+    }
+  };
+
   localStorage.removeItem(STORAGE_KEY);
 
-  [
-    "splitSupplyLength",
-    "splitAttackLength",
-    "splitAttackFlow"
-  ].forEach(id => {
-    const input = document.getElementById(id);
-    if (input) input.value = "";
-  });
+  els.presetSelect.value = "";
+  els.presetSelect.selectedIndex = 0;
 
+  resetSplitLayInputs();
+
+  populateHoseOptions();
   syncInputsFromState();
   renderPressureButtons();
+  saveState();
   calculateAndRender();
 }
 
@@ -2050,7 +2065,7 @@ els.presetSelect.selectedIndex = 0;
 
     function buildPresetData() {
   return {
-    mode: state.mode || "reverse",
+    
 
     hoseLength: state.hoseLength || "",
     hoseSize: state.hoseSize || "",
@@ -2081,8 +2096,6 @@ els.presetSelect.selectedIndex = 0;
 
   state = {
   ...state,
-
-  mode: preset.mode || state.mode,
 
   hoseLength: preset.hoseLength || "",
   hoseSize: preset.hoseSize || "1.88",
@@ -2256,7 +2269,7 @@ calculateReverseFlow({ ...inputs, warnings });
       const nozzleReaction = calculateNozzleReaction(calculatedGpm, nozzlePressure);
 
       if (roundedGpm > selectedHose.maxReferenceFlow) {
-        warnings.push(`Rounded flow exceeds the pump-chart reference range for ${selectedHose.chartName} hose.`);
+        warnings.push(`Rounded flow is above the normal reference range for ${selectedHose.chartName} hose. Confirm with department-approved flow testing or local operating guidance.`);
       }
 
       setResult(
@@ -2325,7 +2338,7 @@ calculateReverseFlow({ ...inputs, warnings });
       const nozzleReaction = calculateNozzleReaction(targetGpm, nozzlePressure);
 
       if (targetGpm > selectedHose.maxReferenceFlow) {
-        warnings.push(`Target flow exceeds the pump-chart reference range for ${selectedHose.chartName} hose.`);
+        warnings.push(`Target flow is above the normal reference range for ${selectedHose.chartName} hose. Confirm with department-approved flow testing or local operating guidance.`);
       }
 
       setResult(
@@ -2627,9 +2640,15 @@ if (state.splitLay.appliance === "standpipe") {
     }
 
     function getSetupDisplay() {
-      const hose = getSelectedHose();
-      return `${state.hoseLength || "—"}' of ${hose.label}`;
-    }
+
+  const hose = getSelectedHose();
+
+  if (state.useCustomCoefficient && state.customCoefficient) {
+    return `${state.hoseLength || "—"}' of ${hose.label} • Custom C ${state.customCoefficient}`;
+  }
+
+  return `${state.hoseLength || "—"}' of ${hose.label}`;
+}
 
     function getNozzleDisplay() {
       if (isSmoothbore()) {
