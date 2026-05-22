@@ -802,7 +802,7 @@ Select a hydraulic calculation mode.
 </div>
 
 <div class="field">
-  <label>Attack Nozzle</label>
+  <label>Attack Nozzle Style</label>
   <select id="splitAttackNozzleType">
     <option value="fog">Fog</option>
     <option value="smoothbore">Smoothbore</option>
@@ -870,7 +870,7 @@ Select a hydraulic calculation mode.
         </div>
 
         <div class="field">
-          <label for="nozzleType" id="nozzleTypeLabel">Nozzle Type</label>
+          <label for="nozzleType" id="nozzleTypeLabel">Nozzle Style</label>
           <select id="nozzleType">
             <option value="fog">Fog</option>
             <option value="smoothbore">Smoothbore</option>
@@ -1591,7 +1591,7 @@ document.querySelector('label[for="applianceLoss"]').textContent =
   isSplitLayMode() ? "none" : "";
 els.nozzleTypeLabel.textContent = isRelayMode()
   ? "Receiving Engine Residual"
-  : "Nozzle Type";
+  : "Nozzle Style";
       if (isRelayMode()) {
   els.nozzleType.innerHTML = `
     <option value="20">20 psi</option>
