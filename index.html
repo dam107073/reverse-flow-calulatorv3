@@ -2635,9 +2635,15 @@ if (state.splitLay.appliance === "standpipe") {
     }
 
     function getSetupDisplay() {
-      const hose = getSelectedHose();
-      return `${state.hoseLength || "—"}' of ${hose.label}`;
-    }
+
+  const hose = getSelectedHose();
+
+  if (state.useCustomCoefficient && state.customCoefficient) {
+    return `${state.hoseLength || "—"}' of ${hose.label} • Custom C ${state.customCoefficient}`;
+  }
+
+  return `${state.hoseLength || "—"}' of ${hose.label}`;
+}
 
     function getNozzleDisplay() {
       if (isSmoothbore()) {
