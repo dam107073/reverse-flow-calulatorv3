@@ -2004,20 +2004,25 @@ els.presetSelect.selectedIndex = 0;
 }
 
     function resetCalculator() {
-  state = { ...DEFAULT_STATE };
+
+  state = {
+    ...DEFAULT_STATE,
+    splitLay: {
+      ...DEFAULT_STATE.splitLay
+    }
+  };
+
   localStorage.removeItem(STORAGE_KEY);
 
-  [
-    "splitSupplyLength",
-    "splitAttackLength",
-    "splitAttackFlow"
-  ].forEach(id => {
-    const input = document.getElementById(id);
-    if (input) input.value = "";
-  });
+  els.presetSelect.value = "";
+  els.presetSelect.selectedIndex = 0;
 
+  resetSplitLayInputs();
+
+  populateHoseOptions();
   syncInputsFromState();
   renderPressureButtons();
+  saveState();
   calculateAndRender();
 }
 
