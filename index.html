@@ -2397,11 +2397,10 @@ function calculateRelayPdp({
     applianceLoss;
 
   if (targetGpm > selectedHose.maxReferenceFlow) {
-    warnings.push(
-  `Target flow is above the normal reference range for ${selectedHose.chartName} hose. Confirm with department-approved flow testing or local operating guidance.`
-);
-    );
-  }
+  warnings.push(
+    `Target flow is above the normal reference range for ${selectedHose.chartName} hose. Confirm with department-approved flow testing or local operating guidance.`
+  );
+}
 
   setResult(
     Math.round(requiredRelayPdp),
