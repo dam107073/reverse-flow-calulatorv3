@@ -222,10 +222,7 @@ button:active:not(:disabled) {
 }
 
 .pressure-buttons {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-    .pressure-buttons button[data-pressure="custom"] {
-  grid-column: 1 / -1;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
 }
 
     .mode-buttons button {
@@ -647,6 +644,13 @@ button:active:not(:disabled) {
   .reset-button {
     width: 100%;
   }
+  .pressure-buttons {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pressure-buttons button[data-pressure="custom"] {
+  grid-column: 1 / -1;
+}
 
   input,
 select {
