@@ -984,7 +984,7 @@ Select a hydraulic calculation mode.
     2.25” = 3,
     2.5” = 2,
     3” = 0.8,
-    Dual 3” = 0.4,
+    Dual 3” = 0.2,
     4” = 0.2,
     5” = 0.08
   </p>
@@ -1052,7 +1052,7 @@ Select a hydraulic calculation mode.
 // APP CONFIG
 // ========================================
 
-const APP_VERSION = "3.6.3-pro-beta";
+const APP_VERSION = "3.6.4-pro-beta";
     const BUILD_DATE = "2026-05-22";
 
 const STORAGE_KEY = "reverse-flow-calculator-v3";
@@ -1822,10 +1822,12 @@ document.addEventListener("keydown", event => {
       });
 
       els.customCoefficient.addEventListener("input", e => {
-        state.customCoefficient = decimalNumber(e.target.value);
-        e.target.value = state.customCoefficient;
-        updateCalculator();
-      });
+  state.customCoefficient = decimalNumber(e.target.value);
+  e.target.value = state.customCoefficient;
+
+  syncCoefficientUi();
+  updateCalculator();
+});
 
       els.saveCoefficientDefaultButton.addEventListener("click", () => {
   const selectedHose = getSelectedHose();
