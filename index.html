@@ -53,10 +53,10 @@
     }
 
     main {
-      width: min(920px, 100%);
-      margin: 0 auto;
-      padding: 20px 16px 40px;
-    }
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 20px 16px calc(40px + env(safe-area-inset-bottom));
+}
 
     h1 {
       font-size: clamp(32px, 6vw, 48px);
@@ -363,6 +363,10 @@ button:active:not(:disabled) {
       width: auto;
     }
 
+    #saveCoefficientDefaultButton {
+  width: 100%;
+}
+
     .disabled-explanations {
       margin-top: 10px;
       display: grid;
@@ -497,11 +501,12 @@ button:active:not(:disabled) {
     }
 
     .footer-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
 
     .reset-button {
       width: auto;
@@ -607,9 +612,46 @@ button:active:not(:disabled) {
       .reset-button { background: #111827; }
     }
 
-    /* ---------- Mobile ---------- */
-    @media (max-width: 720px) {
-  .form-grid { grid-template-columns: 1fr; }
+  /* ---------- Mobile ---------- */
+@media (max-width: 720px) {
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .detail {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .detail:last-child {
+    border-bottom: none;
+  }
+
+}
+
+@media (max-width: 520px) {
+
+  .footer-actions {
+    flex-direction: column;
+  }
+
+  .reset-button {
+    width: 100%;
+  }
+
+  input,
+select {
+  height: 54px;
+  font-size: 17px;
+}
+
+}
 
   .mode-buttons {
     grid-template-columns: 1fr;
@@ -1003,7 +1045,7 @@ Select a hydraulic calculation mode.
 </p>
 
 <p>
-  For the best experience and automatic updates, save the app to your device’s home screen.
+  For the best app-like experience on iPhone, tap Share, then Add to Home Screen. Android users can use Add to Home Screen or Install App when prompted.
 </p>
         <p>This calculator is intended for training and reference. Always follow local pump charts, equipment testing, department policy, and instructor guidance.</p>
       </details>
