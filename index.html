@@ -53,10 +53,10 @@
     }
 
     main {
-      width: min(920px, 100%);
-      margin: 0 auto;
-      padding: 20px 16px 40px;
-    }
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 20px 16px calc(40px + env(safe-area-inset-bottom));
+}
 
     h1 {
       font-size: clamp(32px, 6vw, 48px);
@@ -363,6 +363,10 @@ button:active:not(:disabled) {
       width: auto;
     }
 
+    #saveCoefficientDefaultButton {
+  width: 100%;
+}
+
     .disabled-explanations {
       margin-top: 10px;
       display: grid;
@@ -497,11 +501,12 @@ button:active:not(:disabled) {
     }
 
     .footer-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
 
     .reset-button {
       width: auto;
@@ -607,9 +612,53 @@ button:active:not(:disabled) {
       .reset-button { background: #111827; }
     }
 
-    /* ---------- Mobile ---------- */
-    @media (max-width: 720px) {
-  .form-grid { grid-template-columns: 1fr; }
+  /* ---------- Mobile ---------- */
+@media (max-width: 720px) {
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .detail {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .detail:last-child {
+    border-bottom: none;
+  }
+
+}
+
+@media (max-width: 520px) {
+
+  .footer-actions {
+    flex-direction: column;
+  }
+
+  .reset-button {
+    width: 100%;
+  }
+  .pressure-buttons {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pressure-buttons button[data-pressure="custom"] {
+  grid-column: 1 / -1;
+}
+
+  input,
+select {
+  height: 54px;
+  font-size: 17px;
+}
+
+}
 
   .mode-buttons {
     grid-template-columns: 1fr;
@@ -748,12 +797,14 @@ Select a hydraulic calculation mode.
 <div class="field">
   <label>Attack Hose</label>
   <select id="splitAttackHose">
-    <option value="1.75">1.75"</option>
-    <option value="1.88">1.88"</option>
-    <option value="2">2"</option>
-    <option value="2.25">2.25"</option>
-    <option value="2.5">2.5"</option>
-  </select>
+  <option value="1">1"</option>
+  <option value="1.5">1.5"</option>
+  <option value="1.75">1.75"</option>
+  <option value="1.88">1.88"</option>
+  <option value="2">2"</option>
+  <option value="2.25">2.25"</option>
+  <option value="2.5">2.5"</option>
+</select>
 </div>
 
 <div class="field">
@@ -883,7 +934,17 @@ Select a hydraulic calculation mode.
             <button id="coefficientToggle" class="small-button" type="button">Off</button>
           </div>
           <input id="customCoefficient" type="text" step="any" inputmode="decimal" placeholder="Default coefficient" disabled />
-          <p id="coefficientHelper" class="helper"></p>
+
+<button
+  id="saveCoefficientDefaultButton"
+  class="small-button"
+  type="button"
+  hidden
+>
+  Save as Default for Selected Hose
+</button>
+
+<p id="coefficientHelper" class="helper"></p>
         </div>
       </div>
     </section>
@@ -934,9 +995,10 @@ Select a hydraulic calculation mode.
          FOOTER ACTIONS / INFO
     ========================================= -->
     <div class="footer-actions">
-      <button id="deletePresetButton" class="reset-button" type="button">Delete Preset</button>
-      <button id="resetButton" class="reset-button" type="button">↺ Reset</button>
-    </div>
+  <button id="deletePresetButton" class="reset-button" type="button">Delete Current Preset</button>
+  <button id="resetHoseCoefficientsButton" class="reset-button" type="button">Reset Hose Coefficients</button>
+  <button id="resetButton" class="reset-button" type="button">↺ Reset</button>
+</div>
 
     <section class="card formula" id="formulaCard">
 
@@ -963,13 +1025,15 @@ Select a hydraulic calculation mode.
   <p><strong>Default Coefficients</strong></p>
 
   <p>
+    1" = 100,
+    1.5" = 24,
     1.75” = 15.5,
     1.88” = 8,
     2” = 4,
     2.25” = 3,
     2.5” = 2,
     3” = 0.8,
-    Dual 3” = 0.4,
+    Dual 3” = 0.2,
     4” = 0.2,
     5” = 0.08
   </p>
@@ -988,7 +1052,7 @@ Select a hydraulic calculation mode.
 </p>
 
 <p>
-  For the best experience and automatic updates, save the app to your device’s home screen.
+  For the best app-like experience on iPhone, tap Share, then Add to Home Screen. Android users can use Add to Home Screen or Install App when prompted.
 </p>
         <p>This calculator is intended for training and reference. Always follow local pump charts, equipment testing, department policy, and instructor guidance.</p>
       </details>
@@ -1037,11 +1101,12 @@ Select a hydraulic calculation mode.
 // APP CONFIG
 // ========================================
 
-const APP_VERSION = "3.6.3-pro-beta";
+const APP_VERSION = "3.6.4-pro-beta";
     const BUILD_DATE = "2026-05-22";
 
 const STORAGE_KEY = "reverse-flow-calculator-v3";
 const PRESETS_KEY = "reverse-flow-calculator-presets-v1";
+const HOSE_COEFFS_KEY = "reverse-flow-hose-coefficients-v1";
 
 // ========================================
 // ACCESS CONTROL
@@ -1117,6 +1182,8 @@ console.log(`Reverse Flow Calculator v${APP_VERSION}`);
     // HYDRAULIC DATA
     // ========================================
     const HOSE_OPTIONS = [
+      { id: "1", label: '1"', coefficient: 100, maxReferenceFlow: 80, chartName: '1"' },
+      { id: "1.5", label: '1.5"', coefficient: 24, maxReferenceFlow: 180, chartName: '1.5"' },
       { id: "1.75", label: '1.75"', coefficient: 15.5, maxReferenceFlow: 250, chartName: '1 3/4" / 1.75"' },
       { id: "1.88", label: '1.88"', coefficient: 8, maxReferenceFlow: 250, chartName: '1.88" FDNY' },
       { id: "2", label: '2"', coefficient: 4, maxReferenceFlow: 350, chartName: '2"' },
@@ -1133,6 +1200,54 @@ console.log(`Reverse Flow Calculator v${APP_VERSION}`);
       { id: "4", label: '4"', coefficient: 0.2, maxReferenceFlow: 1200, chartName: '4"' },
       { id: "5", label: '5"', coefficient: 0.08, maxReferenceFlow: 2000, chartName: '5"' },
     ];
+
+    const FACTORY_HOSE_COEFFS = {
+  "1": 100,
+  "1.5": 24,
+  "1.75": 15.5,
+  "1.88": 8,
+  "2": 4,
+  "2.25": 3,
+  "2.5": 2,
+  "3": 0.8,
+  "dual3": 0.2,
+  "4": 0.2,
+  "5": 0.08,
+};
+
+function loadSavedHoseCoefficients() {
+  try {
+    const saved = localStorage.getItem(HOSE_COEFFS_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveHoseCoefficient(hoseId, coefficient) {
+  const savedCoefficients = loadSavedHoseCoefficients();
+
+  savedCoefficients[hoseId] = coefficient;
+
+  localStorage.setItem(
+    HOSE_COEFFS_KEY,
+    JSON.stringify(savedCoefficients)
+  );
+}
+
+function resetSavedHoseCoefficients() {
+  localStorage.removeItem(HOSE_COEFFS_KEY);
+}
+
+function getActiveHoseCoefficient(hoseId) {
+  const savedCoefficients = loadSavedHoseCoefficients();
+
+  return savedCoefficients[hoseId] ?? FACTORY_HOSE_COEFFS[hoseId];
+}
+
+function isModifiedHoseCoefficient(hoseId) {
+  return getActiveHoseCoefficient(hoseId) !== FACTORY_HOSE_COEFFS[hoseId];
+}
 
     const NOZZLE_PRESSURES = {
   fog: [50, 55, 75, 100, "custom"],
@@ -1188,6 +1303,7 @@ console.log(`Reverse Flow Calculator v${APP_VERSION}`);
       presetSelect: document.getElementById("presetSelect"),
       savePresetButton: document.getElementById("savePresetButton"),
       deletePresetButton: document.getElementById("deletePresetButton"),
+      resetHoseCoefficientsButton: document.getElementById("resetHoseCoefficientsButton"),
       resetButton: document.getElementById("resetButton"),
 
       reverseModeButton: document.getElementById("reverseModeButton"),
@@ -1220,6 +1336,7 @@ console.log(`Reverse Flow Calculator v${APP_VERSION}`);
       applianceLoss: document.getElementById("applianceLoss"),
       coefficientToggle: document.getElementById("coefficientToggle"),
       customCoefficient: document.getElementById("customCoefficient"),
+      saveCoefficientDefaultButton: document.getElementById("saveCoefficientDefaultButton"),
       coefficientHelper: document.getElementById("coefficientHelper"),
 
       primaryResultLabel: document.getElementById("primaryResultLabel"),
@@ -1318,14 +1435,58 @@ function updateAccessBadge() {
     // ========================================
     // UI POPULATION
     // ========================================
-  function populateHoseOptions() {
+  function hoseOptionLabel(hose) {
+  const activeCoefficient = getActiveHoseCoefficient(hose.id);
+
+  const coefficientLabel = isModifiedHoseCoefficient(hose.id)
+    ? `CUSTOM C ${activeCoefficient}`
+    : `C ${activeCoefficient}`;
+
+  return `${hose.label} — ${coefficientLabel}`;
+}
+
+function populateHoseOptions() {
   const hoseOptions = isRelayMode()
     ? RELAY_HOSE_OPTIONS
     : HOSE_OPTIONS;
 
   els.hoseSize.innerHTML = hoseOptions.map(hose => (
-    `<option value="${hose.id}">${hose.label} — C ${hose.coefficient}</option>`
+    `<option value="${hose.id}">${hoseOptionLabel(hose)}</option>`
   )).join("");
+
+  const splitSupplyHose =
+    document.getElementById("splitSupplyHose");
+
+  const splitAttackHose =
+    document.getElementById("splitAttackHose");
+
+  if (splitSupplyHose) {
+
+    const supplyOptions = HOSE_OPTIONS.filter(hose =>
+      ["2", "2.25", "2.5", "3", "4", "5"].includes(hose.id)
+    );
+
+    splitSupplyHose.innerHTML = supplyOptions.map(hose => (
+      `<option value="${hose.id}">${hoseOptionLabel(hose)}</option>`
+    )).join("");
+
+    splitSupplyHose.value =
+      state.splitLay.supplyHoseSize;
+  }
+
+  if (splitAttackHose) {
+
+    const attackOptions = HOSE_OPTIONS.filter(hose =>
+      ["1", "1.5", "1.75", "1.88", "2", "2.25", "2.5"].includes(hose.id)
+    );
+
+    splitAttackHose.innerHTML = attackOptions.map(hose => (
+      `<option value="${hose.id}">${hoseOptionLabel(hose)}</option>`
+    )).join("");
+
+    splitAttackHose.value =
+      state.splitLay.attackHoseSize;
+  }
 }
 
     function populateSmoothboreTips() {
@@ -1669,10 +1830,27 @@ function syncSmoothboreUi() {
       els.customCoefficient.disabled = !state.useCustomCoefficient;
       els.coefficientToggle.textContent = state.useCustomCoefficient ? "On" : "Off";
       els.coefficientToggle.classList.toggle("active", state.useCustomCoefficient);
-      els.customCoefficient.placeholder = String(selectedHose.coefficient);
-      els.coefficientHelper.textContent = state.useCustomCoefficient
-        ? "Using custom hose coefficient."
-        : `Using default coefficient: ${selectedHose.coefficient}`;
+      const activeCoefficient = getActiveHoseCoefficient(selectedHose.id);
+const factoryCoefficient = FACTORY_HOSE_COEFFS[selectedHose.id];
+const modifiedText = isModifiedHoseCoefficient(selectedHose.id)
+  ? ` Modified from factory default C ${factoryCoefficient}.`
+  : "";
+
+els.customCoefficient.placeholder = String(activeCoefficient);
+
+els.coefficientHelper.textContent = state.useCustomCoefficient
+  ? "Using temporary custom coefficient for this calculation only."
+  : `Using hose default coefficient: ${activeCoefficient}.${modifiedText}`;
+
+      const hasTemporaryCustomCoefficient =
+  state.useCustomCoefficient &&
+  numberOrNull(state.customCoefficient) !== null;
+
+els.saveCoefficientDefaultButton.hidden =
+  !hasTemporaryCustomCoefficient;
+
+els.saveCoefficientDefaultButton.textContent =
+  `Save as Default for ${selectedHose.label} Hose`;
     }
 
     // ========================================
@@ -1683,6 +1861,27 @@ function syncSmoothboreUi() {
       els.savePresetButton.addEventListener("click", saveCurrentSetupAsPreset);
       els.deletePresetButton.addEventListener("click", deleteSelectedPreset);
       els.resetButton.addEventListener("click", resetCalculator);
+      els.resetHoseCoefficientsButton.addEventListener("click", () => {
+  const confirmed = confirm(
+    "Reset all hose coefficients back to app defaults?"
+  );
+
+  if (!confirmed) return;
+
+  resetSavedHoseCoefficients();
+
+  state.useCustomCoefficient = false;
+  state.customCoefficient = "";
+  els.customCoefficient.value = "";
+
+  populateHoseOptions();
+  els.hoseSize.value = state.hoseSize;
+
+  syncCoefficientUi();
+  updateCalculator();
+
+  alert("Hose coefficients reset to app defaults.");
+});
 
       els.reverseModeButton.addEventListener("click", () => setMode("reverse"));
 els.pdpModeButton.addEventListener("click", () => setMode("requiredPdp"));
@@ -1713,10 +1912,42 @@ document.addEventListener("keydown", event => {
       });
 
       els.customCoefficient.addEventListener("input", e => {
-        state.customCoefficient = decimalNumber(e.target.value);
-        e.target.value = state.customCoefficient;
-        updateCalculator();
-      });
+  state.customCoefficient = decimalNumber(e.target.value);
+  e.target.value = state.customCoefficient;
+
+  syncCoefficientUi();
+  updateCalculator();
+});
+
+      els.saveCoefficientDefaultButton.addEventListener("click", () => {
+  const selectedHose = getSelectedHose();
+  const coefficient = numberOrNull(state.customCoefficient);
+
+  if (coefficient === null || coefficient <= 0) {
+    alert("Enter a valid hose coefficient greater than 0.");
+    return;
+  }
+
+        const confirmed = confirm(
+  `Save C ${coefficient} as the new default coefficient for ${selectedHose.label} hose?`
+);
+
+if (!confirmed) return;
+
+  saveHoseCoefficient(selectedHose.id, coefficient);
+
+  state.useCustomCoefficient = false;
+  state.customCoefficient = "";
+  els.customCoefficient.value = "";
+
+  populateHoseOptions();
+  els.hoseSize.value = selectedHose.id;
+
+  syncCoefficientUi();
+  updateCalculator();
+
+  alert(`${selectedHose.label} hose default coefficient saved as C ${coefficient}.`);
+});
 
       els.hoseSize.addEventListener("change", e => {
   state.hoseSize = e.target.value;
@@ -2223,7 +2454,7 @@ calculateReverseFlow({ ...inputs, warnings });
       const selectedHose = getSelectedHose();
       const coefficient = state.useCustomCoefficient
         ? numberOrNull(state.customCoefficient)
-        : selectedHose.coefficient;
+        : getActiveHoseCoefficient(selectedHose.id);
 
       let nozzlePressure =
   state.nozzlePressure === "custom"
@@ -2304,7 +2535,7 @@ calculateReverseFlow({ ...inputs, warnings });
       const selectedHose = getSelectedHose();
       const coefficient = state.useCustomCoefficient
         ? numberOrNull(state.customCoefficient)
-        : selectedHose.coefficient;
+        : getActiveHoseCoefficient(selectedHose.id);
       const tip = getSelectedSmoothboreTip();
 
       if (pdp === null || hoseLength === null || coefficient === null || !tip || hoseLength <= 0 || coefficient <= 0) {
@@ -2522,9 +2753,9 @@ function calculateSplitLay(warnings) {
   const attackQ = attackFlow / 100;
 
   const attackFlPer100 =
-    attackHose.coefficient *
-    attackQ *
-    attackQ;
+  getActiveHoseCoefficient(attackHose.id) *
+  attackQ *
+  attackQ;
 
   const attackTotalFl =
     attackFlPer100 *
@@ -2562,9 +2793,9 @@ if (state.splitLay.appliance === "standpipe") {
     totalSupplyFlow / 100;
 
   const supplyFlPer100 =
-    supplyHose.coefficient *
-    supplyQ *
-    supplyQ;
+  getActiveHoseCoefficient(supplyHose.id) *
+  supplyQ *
+  supplyQ;
 
   const supplyTotalFl =
     supplyFlPer100 *
