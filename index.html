@@ -2156,6 +2156,12 @@ document.getElementById("splitAttackSmoothboreTip")?.addEventListener("change", 
   e.target.value =
     state.customNozzlePressure;
 
+  syncCalculatedSmoothboreTargetFlow();
+
+  if (isRequiredPdpMode() && isSmoothbore()) {
+    els.pdp.value = state.targetGpm;
+  }
+
   updateCalculator();
 
 });
