@@ -1,6 +1,6 @@
 {
-  "name": "Reverse Flow Calculator",
-  "short_name": "Reverse Flow",
+  "name": "Reverse Flow: Fireground Hydraulics",
+  "short_name": "REVERSE FLOW",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#020617",
