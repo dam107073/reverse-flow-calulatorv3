@@ -1386,17 +1386,58 @@ function updateAccessBadge() {
     // ========================================
     // UI POPULATION
     // ========================================
-  function populateHoseOptions() {
+  function hoseOptionLabel(hose) {
+  const activeCoefficient = getActiveHoseCoefficient(hose.id);
+
+  const coefficientLabel = isModifiedHoseCoefficient(hose.id)
+    ? `CUSTOM C ${activeCoefficient}`
+    : `C ${activeCoefficient}`;
+
+  return `${hose.label} — ${coefficientLabel}`;
+}
+
+function populateHoseOptions() {
   const hoseOptions = isRelayMode()
     ? RELAY_HOSE_OPTIONS
     : HOSE_OPTIONS;
 
-  els.hoseSize.innerHTML = hoseOptions.map(hose => {
-    const activeCoefficient = getActiveHoseCoefficient(hose.id);
-    const modifiedMarker = isModifiedHoseCoefficient(hose.id) ? "*" : "";
+  els.hoseSize.innerHTML = hoseOptions.map(hose => (
+    `<option value="${hose.id}">${hoseOptionLabel(hose)}</option>`
+  )).join("");
 
-    return `<option value="${hose.id}">${hose.label} — C ${activeCoefficient}${modifiedMarker}</option>`;
-  }).join("");
+  const splitSupplyHose =
+    document.getElementById("splitSupplyHose");
+
+  const splitAttackHose =
+    document.getElementById("splitAttackHose");
+
+  if (splitSupplyHose) {
+
+    const supplyOptions = HOSE_OPTIONS.filter(hose =>
+      ["2", "2.25", "2.5", "3", "4", "5"].includes(hose.id)
+    );
+
+    splitSupplyHose.innerHTML = supplyOptions.map(hose => (
+      `<option value="${hose.id}">${hoseOptionLabel(hose)}</option>`
+    )).join("");
+
+    splitSupplyHose.value =
+      state.splitLay.supplyHoseSize;
+  }
+
+  if (splitAttackHose) {
+
+    const attackOptions = HOSE_OPTIONS.filter(hose =>
+      ["1", "1.5", "1.75", "1.88", "2", "2.25", "2.5"].includes(hose.id)
+    );
+
+    splitAttackHose.innerHTML = attackOptions.map(hose => (
+      `<option value="${hose.id}">${hoseOptionLabel(hose)}</option>`
+    )).join("");
+
+    splitAttackHose.value =
+      state.splitLay.attackHoseSize;
+  }
 }
 
     function populateSmoothboreTips() {
@@ -1837,6 +1878,12 @@ document.addEventListener("keydown", event => {
     alert("Enter a valid hose coefficient greater than 0.");
     return;
   }
+
+        const confirmed = confirm(
+  `Save C ${coefficient} as the new default coefficient for ${selectedHose.label} hose?`
+);
+
+if (!confirmed) return;
 
   saveHoseCoefficient(selectedHose.id, coefficient);
 
