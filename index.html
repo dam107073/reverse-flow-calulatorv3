@@ -3022,13 +3022,22 @@ const actualAttack2 =
     Math.round(totalPdp),
     `${Math.round(totalAttackFlow)} GPM`,
     `${Math.round(
-      supply1TotalFl + supply2TotalFl + attack1.totalFl + (attack2 ? attack2.totalFl : 0)
-    )} psi total`,
+  supply1TotalFl +
+  supply2TotalFl +
+  actualAttack1.totalFl +
+  (actualAttack2 ? actualAttack2.totalFl : 0)
+)} psi total`,
     sectionCount === "3"
-  ? `S1 ${Math.round(supply1TotalFl)} / S2 ${Math.round(supply2TotalFl)} / Attack ${Math.round(attack1.totalFl + (attack2 ? attack2.totalFl : 0))}`
-  : `Supply ${Math.round(supply1TotalFl)} / Attack ${Math.round(attack1.totalFl + (attack2 ? attack2.totalFl : 0))}`,
+  ? attackLines === 2
+  ? `S1 ${Math.round(supply1TotalFl)} / S2 ${Math.round(supply2TotalFl)} / L1 ${Math.round(actualAttack1.totalFl)} / L2 ${Math.round(actualAttack2.totalFl)}`
+  : `S1 ${Math.round(supply1TotalFl)} / S2 ${Math.round(supply2TotalFl)} / A ${Math.round(actualAttack1.totalFl)}`
+  : attackLines === 2
+  ? `S ${Math.round(supply1TotalFl)} / L1 ${Math.round(actualAttack1.totalFl)} / L2 ${Math.round(actualAttack2.totalFl)}`
+  : `S ${Math.round(supply1TotalFl)} / A ${Math.round(actualAttack1.totalFl)}`,
     attackLines === 2
-  ? `L1 ${Math.round(actualAttack1.actualFlow)} @ ${Math.round(actualAttack1.actualNozzlePressure)} / L2 ${Math.round(actualAttack2.actualFlow)} @ ${Math.round(actualAttack2.actualNozzlePressure)}`
+  attackLines === 2
+  ? `L1 ${Math.round(actualAttack1.actualFlow)} GPM @ ${Math.round(actualAttack1.actualNozzlePressure)} psi
+L2 ${Math.round(actualAttack2.actualFlow)} GPM @ ${Math.round(actualAttack2.actualNozzlePressure)} psi`
   : `${Math.round(actualAttack1.actualFlow)} GPM @ ${Math.round(actualAttack1.actualNozzlePressure)} psi`,
     supplyLayout === "dual"
       ? `Dual ${supply1Hose.label} Supply`
