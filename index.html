@@ -634,6 +634,13 @@ button:active:not(:disabled) {
   letter-spacing: -0.03em;
   white-space: pre-line;
 }
+    .split-result-item strong.overpressure {
+  color: #f97316;
+}
+
+.split-result-item strong.normal-pressure {
+  color: inherit;
+}
 
 @media (max-width: 720px) {
 
@@ -3845,22 +3852,42 @@ function calculateSplitSmoothboreReaction(line, nozzlePressure) {
 
   els.splitAttack1FlowResult.textContent =
     `${Math.round(actualAttack1.actualFlow)} GPM`;
+      els.splitAttack1FlowResult.classList.toggle(
+  "overpressure",
+  actualAttack1.actualNozzlePressure >
+    actualAttack1.nozzlePressure + 1
+);
 
   els.splitAttack1NpResult.textContent =
     `${Math.round(actualAttack1.actualNozzlePressure)} psi`;
 
+  els.splitAttack1NpResult.classList.toggle(
+    "overpressure",
+    actualAttack1.actualNozzlePressure > actualAttack1.nozzlePressure + 1
+  );
+
   els.splitAttack1FlResult.textContent =
-  `${Math.round(actualAttack1.actualTotalFl)} psi`
+  `${Math.round(actualAttack1.actualTotalFl)} psi`;
 
   if (actualAttack2) {
     els.splitAttack2FlowResult.textContent =
       `${Math.round(actualAttack2.actualFlow)} GPM`;
+    els.splitAttack2FlowResult.classList.toggle(
+  "overpressure",
+  actualAttack2.actualNozzlePressure >
+    actualAttack2.nozzlePressure + 1
+);
 
     els.splitAttack2NpResult.textContent =
       `${Math.round(actualAttack2.actualNozzlePressure)} psi`;
 
+    els.splitAttack2NpResult.classList.toggle(
+    "overpressure",
+    actualAttack2.actualNozzlePressure > actualAttack2.nozzlePressure + 1
+  );
+
     els.splitAttack2FlResult.textContent =
-     `${Math.round(actualAttack2.actualTotalFl)} psi`
+     `${Math.round(actualAttack2.actualTotalFl)} psi`;
   }
 }
     function setResult(rounded, calculated, total, per100, nozzle, setup, reaction = "-") {
