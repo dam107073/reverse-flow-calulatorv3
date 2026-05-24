@@ -2963,7 +2963,11 @@ els.saveCoefficientDefaultButton.textContent =
     // ========================================
     function bindEvents() {
       els.presetSelect.addEventListener("change", e => applyPreset(e.target.value));
-      els.savePresetButton.addEventListener("click", saveCurrentSetupAsPreset);
+      els.savePresetButton.addEventListener("click", event => {
+  event.preventDefault();
+  event.stopPropagation();
+  saveCurrentSetupAsPreset();
+});
       els.deletePresetButton.addEventListener("click", deleteSelectedPreset);
       els.resetButton.addEventListener("click", resetCalculator);
       els.resetHoseCoefficientsButton.addEventListener("click", () => {
