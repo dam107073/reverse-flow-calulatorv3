@@ -372,6 +372,66 @@ button:active:not(:disabled) {
   margin-left: -14px;
   z-index: 1;
 }
+    #pumpChartButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+
+  margin-top: 10px;
+
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+
+#pumpChartButtons button {
+  position: relative;
+
+  border: none;
+  border-radius: 0;
+  min-height: 54px;
+
+  background: transparent;
+  box-shadow: none;
+}
+
+#pumpChartButtons button.active {
+  background: var(--button);
+  color: var(--button-text);
+  box-shadow: none;
+}
+
+/* Left active */
+#pumpChartButtons button:first-child.active {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 22px) 0,
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Right active */
+#pumpChartButtons button:last-child.active {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    28px 100%
+  );
+}
+
+#pumpChartButtons button:first-child {
+  margin-right: -11px;
+  z-index: 2;
+}
+
+#pumpChartButtons button:last-child {
+  margin-left: -11px;
+  z-index: 1;
+}
 
 .pressure-buttons {
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -1080,15 +1140,24 @@ select {
             <option value="">No saved setup selected</option>
           </select>
           <p class="helper">Select a saved hose/nozzle setup to quickly fill the calculator.</p>
-          <button id="savePresetButton" class="small-button" type="button">Save to Pump Chart</button>
-          <button
-          id="viewPumpChartButton"
-          class="small-button"
-          type="button"
-          style="margin-top:10px;width:100%;"
-        >
-          View Pump Chart
-        </button>
+          <div id="pumpChartButtons">
+
+  <button
+    id="savePresetButton"
+    type="button"
+    class="active"
+  >
+    Save Setup
+  </button>
+
+  <button
+    id="viewPumpChartButton"
+    type="button"
+  >
+    Pump Chart
+  </button>
+
+</div>
         </div>
 
         <div class="field full">
@@ -2290,9 +2359,35 @@ if (splitAttack2Hose) {
 
     return `
       <div class="section-card" style="margin-bottom:12px;">
-        <strong style="font-size:20px;">
-          ${preset.name}
-        </strong>
+        <div style="
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:4px;
+">
+
+  <strong style="font-size:20px;">
+    ${preset.name}
+  </strong>
+
+  <div style="
+    font-size:12px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--border);
+    white-space:nowrap;
+  ">
+    ${
+      preset.nozzleType === "smoothbore"
+        ? "SMOOTHBORE"
+        : "FOG"
+    }
+  </div>
+
+</div>
 
         <p class="helper" style="margin-bottom:10px;">
         ${preset.hoseLength || "—"}'
@@ -2300,30 +2395,63 @@ if (splitAttack2Hose) {
         </p>
 
         <div style="
-          font-size:28px;
-          font-weight:800;
-          margin-bottom:6px;
-        ">
-          Pump ${preset.calculatedPdp || "—"} PSI
-        </div>
+  margin:14px 0;
+  padding:14px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+">
 
-        <div class="helper" style="margin-bottom:14px;">
-          ${preset.calculatedFlow || "—"}
-        </div>
+  <div style="
+    font-size:15px;
+    opacity:0.7;
+    margin-bottom:4px;
+  ">
+    PUMP DISCHARGE PRESSURE
+  </div>
 
-        <button
-          class="small-button"
-          onclick="loadPumpChartPreset('${preset.id}')"
-        >
-          Load
-        </button>
+  <div style="
+    font-size:36px;
+    font-weight:900;
+    line-height:1;
+    margin-bottom:10px;
+  ">
+    ${preset.calculatedPdp || "—"} PSI
+  </div>
 
-        <button
-          class="small-button"
-          onclick="deletePumpChartPreset('${preset.id}')"
-        >
-          Delete
-        </button>
+  <div style="
+    font-size:18px;
+    font-weight:700;
+    opacity:0.9;
+  ">
+    ${preset.calculatedFlow || "—"}
+  </div>
+
+</div>
+
+        <div style="
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+">
+
+  <button
+    class="small-button"
+    style="flex:1;"
+    onclick="loadPumpChartPreset('${preset.id}')"
+  >
+    Load Setup
+  </button>
+
+  <button
+    class="small-button"
+    style="flex:1;"
+    onclick="deletePumpChartPreset('${preset.id}')"
+  >
+    Delete
+  </button>
+
+</div>
       </div>
     `;
 
@@ -2875,6 +3003,7 @@ els.proModal.addEventListener("click", event => {
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
     els.proModal.hidden = true;
+    els.pumpChartModal.hidden = true;
   }
 });
 
