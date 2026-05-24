@@ -277,6 +277,38 @@ button:active:not(:disabled) {
 .mode-buttons {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+    #splitSectionButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.04);
+}
+
+#splitSectionButtons button {
+  border: none;
+  border-radius: 14px;
+  min-height: 52px;
+  box-shadow: none;
+}
+
+#splitSectionButtons button:not(.active) {
+  background: transparent;
+}
+
+#splitSectionButtons button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#splitSectionButtons button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
 
 .pressure-buttons {
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
