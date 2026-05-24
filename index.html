@@ -2801,6 +2801,8 @@ function enforceSplitLayRestrictions() {
   if (!twoAttackAllowed) {
     state.splitLay.attackLines = "1";
 
+    clearSplitAttack2State();
+
     if (attack2Button) {
       attack2Button.disabled = true;
     }
@@ -4358,8 +4360,8 @@ function calculateSplitSmoothboreReaction(line, nozzlePressure) {
     const pressureDifference =
   actualAttack2
     ? Math.abs(
-        actualAttack1.requiredPdp -
-        actualAttack2.requiredPdp
+        actualAttack1.actualNozzlePressure -
+        actualAttack2.actualNozzlePressure
       )
     : 0;
       els.splitAttack1ReactionResult.textContent =
@@ -4373,7 +4375,7 @@ if (!actualAttack2) {
 els.splitAttack1PressureTag.className =
   "pressure-path-tag balanced";
 
-} else if (pressureDifference <= 2) {
+} else if (pressureDifference <= 3) {
 
  els.splitAttack1PressureTag.textContent =
   "BALANCED";
