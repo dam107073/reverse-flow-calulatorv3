@@ -1080,7 +1080,15 @@ select {
             <option value="">No saved setup selected</option>
           </select>
           <p class="helper">Select a saved hose/nozzle setup to quickly fill the calculator.</p>
-          <button id="savePresetButton" class="small-button" type="button">Save Current Setup</button>
+          <button id="savePresetButton" class="small-button" type="button">Save to Pump Chart</button>
+          <button
+          id="viewPumpChartButton"
+          class="small-button"
+          type="button"
+          style="margin-top:10px;width:100%;"
+        >
+          View Pump Chart
+        </button>
         </div>
 
         <div class="field full">
@@ -1718,6 +1726,37 @@ Select a hydraulic calculation mode.
 
   </div>
 </div>
+
+    <div id="pumpChartModal" class="pro-modal" hidden>
+  <div class="pro-modal-content">
+
+    <div class="pro-modal-header">
+
+      <div class="badge beta">
+        PUMP CHART
+      </div>
+
+      <h2>Pump Chart</h2>
+
+      <button
+        id="closePumpChartModal"
+        class="modal-close-button"
+        type="button"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <p class="pro-modal-subtitle">
+      Saved operational hose and nozzle setups.
+    </p>
+
+    <div id="pumpChartList" class="pro-feature-list">
+    </div>
+
+  </div>
+</div>
     
     <p class="version-footer">
   Reverse Flow: Fireground Hydraulics © 2026
@@ -1962,6 +2001,18 @@ function isModifiedHoseCoefficient(hoseId) {
       deletePresetButton: document.getElementById("deletePresetButton"),
       resetHoseCoefficientsButton: document.getElementById("resetHoseCoefficientsButton"),
       resetButton: document.getElementById("resetButton"),
+
+      viewPumpChartButton:
+        document.getElementById("viewPumpChartButton"),
+
+      pumpChartModal:
+        document.getElementById("pumpChartModal"),
+
+      closePumpChartModal:
+        document.getElementById("closePumpChartModal"),
+
+      pumpChartList:
+        document.getElementById("pumpChartList"),
 
       reverseModeButton: document.getElementById("reverseModeButton"),
       pdpModeButton: document.getElementById("pdpModeButton"),
@@ -2213,6 +2264,56 @@ if (splitAttack2Hose) {
         )).join("")}
       `;
     }
+
+      function renderPumpChart() {
+
+  const presets = loadPresets();
+
+  if (!presets.length) {
+    els.pumpChartList.innerHTML = `
+      <div class="disabled-note">
+        No saved pump chart setups yet.
+      </div>
+    `;
+    return;
+  }
+
+  els.pumpChartList.innerHTML = presets.map(preset => {
+
+    const nozzleDisplay =
+      preset.nozzleType === "smoothbore"
+        ? `${preset.smoothboreTip || "SB"} Smoothbore`
+        : `Fog @ ${preset.nozzlePressure} psi`;
+
+    return `
+      <div class="section-card" style="margin-bottom:12px;">
+        <strong style="font-size:20px;">
+          ${preset.name}
+        </strong>
+
+        <p class="helper">
+          ${preset.hoseLength || "—"}'
+          ${preset.hoseSize || "—"} hose • ${nozzleDisplay}
+        </p>
+
+        <button
+          class="small-button"
+          onclick="loadPumpChartPreset('${preset.id}')"
+        >
+          Load
+        </button>
+
+        <button
+          class="small-button"
+          onclick="deletePumpChartPreset('${preset.id}')"
+        >
+          Delete
+        </button>
+      </div>
+    `;
+
+  }).join("");
+}
 
     function renderPressureButtons() {
   if (isSplitLayMode()) {
@@ -2735,6 +2836,20 @@ els.splitLayButton.addEventListener("click", () => {
 els.closeProModal.addEventListener("click", () => {
   els.proModal.hidden = true;
 });
+      els.viewPumpChartButton.addEventListener("click", () => {
+  renderPumpChart();
+  els.pumpChartModal.hidden = false;
+});
+
+els.closePumpChartModal.addEventListener("click", () => {
+  els.pumpChartModal.hidden = true;
+});
+
+els.pumpChartModal.addEventListener("click", event => {
+  if (event.target === els.pumpChartModal) {
+    els.pumpChartModal.hidden = true;
+  }
+});
 
 els.proModal.addEventListener("click", event => {
   if (event.target === els.proModal) {
@@ -3170,6 +3285,41 @@ els.presetSelect.selectedIndex = 0;
   renderPressureButtons();
   calculateAndRender();
 }
+    window.loadPumpChartPreset = function(presetId) {
+
+  applyPreset(presetId);
+
+  els.pumpChartModal.hidden = true;
+};
+
+window.deletePumpChartPreset = function(presetId) {
+
+  const presets = loadPresets();
+
+  const preset = presets.find(
+    item => item.id === presetId
+  );
+
+  if (!preset) return;
+
+  const confirmed = confirm(
+    `Delete "${preset.name}" from Pump Chart?`
+  );
+
+  if (!confirmed) return;
+
+  const updatedPresets =
+    presets.filter(item => item.id !== presetId);
+
+  savePresets(updatedPresets);
+
+  renderPresetOptions();
+  renderPumpChart();
+
+  if (els.presetSelect.value === presetId) {
+    els.presetSelect.value = "";
+  }
+};
 
     function deleteSelectedPreset() {
       const selectedId = els.presetSelect.value;
