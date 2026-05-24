@@ -409,35 +409,9 @@ button:active:not(:disabled) {
     0 0 18px rgba(90,125,155,0.12);
 }
 
-/* Left active */
-#pumpChartButtons button:first-child.active {
-  clip-path: polygon(
-    0 0,
-    calc(100% - 22px) 0,
-    100% 100%,
-    0 100%
-  );
-}
-
-/* Right active */
-#pumpChartButtons button:last-child.active {
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    100% 100%,
-    28px 100%
-  );
-}
-
-#pumpChartButtons button:first-child {
-  margin-right: -11px;
-  z-index: 2;
-}
-
-#pumpChartButtons button:last-child {
-  margin-left: -11px;
-  z-index: 1;
-}
+  #pumpChartButtons button:first-child {
+  border-right: 1px solid rgba(255,255,255,0.06);
+}  
 
 .pressure-buttons {
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
