@@ -3437,9 +3437,8 @@ els.presetSelect.selectedIndex = 0;
           ? `${els.roundedGpm.textContent} GPM`
           : els.calculatedGpm.textContent,
 
-    splitLay: {
-      ...state.splitLay
-    }
+    splitLay: JSON.parse(JSON.stringify(state.splitLay))
+    console.log("SPLIT LAY SAVE", state.splitLay);
   };
 }
     function applyPreset(presetId) {
