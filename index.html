@@ -2388,9 +2388,24 @@ if (splitAttack2Hose) {
         ? "SMOOTHBORE"
         : "FOG";
 
-    const setupSummary = isSplitLayPreset
-      ? "Multi-section supply / attack setup"
-      : `${preset.calculatedFlow || "—"} • ${preset.hoseLength || "—"}' ${preset.hoseSize || "—"} • ${nozzleDisplay}`;
+    const splitLay = preset.splitLay || {};
+
+const splitAttackCount = splitLay.attackLines || "1";
+const splitSectionCount = splitLay.sectionCount || "2";
+const dualSupply = splitLay.dualSupply ? "Dual Supply 1" : "Single Supply 1";
+
+const splitSupply1 =
+  `S1: ${splitLay.supplyLength || "—"}' ${splitLay.supplyHose || "—"}`;
+
+const splitSupplySummary =
+  `${dualSupply} • ${splitSectionCount === "3" ? "2 Supply Sections" : "1 Supply Section"}<br>${splitSupply1}`;
+
+const splitAttackSummary =
+  `${splitAttackCount} Attack Line${splitAttackCount === "2" ? "s" : ""}`;
+
+const setupSummary = isSplitLayPreset
+  ? `${splitSupplySummary}<br>${splitAttackSummary}`
+  : `${preset.calculatedFlow || "—"} • ${preset.hoseLength || "—"}' ${preset.hoseSize || "—"} • ${nozzleDisplay}`;
 
     return `
       <div class="section-card" style="margin-bottom:12px;">
@@ -2433,7 +2448,7 @@ if (splitAttack2Hose) {
             letter-spacing:-1px;
             background:transparent;
           ">
-            ${preset.calculatedPdp || "—"} PSI
+            ${preset.calculatedPdp || "—"}
           </div>
 
           <div style="
