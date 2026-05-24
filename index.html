@@ -2082,7 +2082,22 @@ syncSplitLayUi();
 
 function syncSmoothboreUi() {
 
-  function syncSplitLayUi() {
+  if (isRelayMode() || isSplitLayMode()) {
+    els.smoothboreTipField.hidden = true;
+    els.smoothboreTipField.style.display = "none";
+    return;
+  }
+
+  els.smoothboreTipField.hidden = !isSmoothbore();
+  els.smoothboreTipField.style.display = isSmoothbore() ? "" : "none";
+
+  if (!isSmoothbore()) {
+    state.smoothboreTip = "";
+    els.smoothboreTip.value = "";
+  }
+}
+
+function syncSplitLayUi() {
   if (!isSplitLayMode()) return;
 
   const supply2Section = document.getElementById("splitSupply2Section");
@@ -2136,6 +2151,7 @@ function syncSmoothboreUi() {
   syncSplitNozzleUi("1");
   syncSplitNozzleUi("2");
 }
+    }
 
 function syncSplitNozzleUi(lineNumber) {
   const nozzleType = document.getElementById(`splitAttack${lineNumber}NozzleType`);
@@ -2172,21 +2188,6 @@ function syncSplitNozzleUi(lineNumber) {
   tipField.style.display = isSmoothboreLine ? "" : "none";
 
   flowField.style.display = isSmoothboreLine ? "none" : "";
-}
-
-  if (isRelayMode() || isSplitLayMode()) {
-    els.smoothboreTipField.hidden = true;
-    els.smoothboreTipField.style.display = "none";
-    return;
-  }
-
-  els.smoothboreTipField.hidden = !isSmoothbore();
-  els.smoothboreTipField.style.display = isSmoothbore() ? "" : "none";
-
-  if (!isSmoothbore()) {
-    state.smoothboreTip = "";
-    els.smoothboreTip.value = "";
-  }
 }
 
     function syncCoefficientUi() {
@@ -3173,156 +3174,7 @@ function formatGpm(value) {
   return `${roundToNearest5(value)} GPM`;
 }
 
-  // ========================================
-  // FOG NOZZLE FLOW
-  // ========================================
 
-  if (state.splitLay.attackNozzleType === "fog") {
-
-    attackFlow =
-      numberOrNull(state.splitLay.attackFlow);
-
-    if (!attackFlow) {
-      warnings.push("Enter target attack flow.");
-      renderWarnings(warnings);
-      return;
-    }
-
-  }
-
-  // ========================================
-  // SMOOTHBORE FLOW
-  // ========================================
-
-  else {
-
-    const tip =
-      SMOOTHBORE_TIPS.find(
-        item =>
-          item.id === state.splitLay.attackSmoothboreTip
-      );
-
-    const nozzlePressure =
-      numberOrNull(
-        state.splitLay.attackNozzlePressure
-      );
-
-    if (!tip || nozzlePressure === null) {
-      warnings.push("Select smoothbore tip and nozzle pressure.");
-      renderWarnings(warnings);
-      return;
-    }
-
-    attackFlow = smoothboreGpm(
-      tip.diameter,
-      nozzlePressure
-    );
-
-  }
-
-  const nozzlePressure =
-    numberOrNull(
-      state.splitLay.attackNozzlePressure
-    ) || 0;
-
-  const attackQ = attackFlow / 100;
-
-  const attackFlPer100 =
-  getActiveHoseCoefficient(attackHose.id) *
-  attackQ *
-  attackQ;
-
-  const attackTotalFl =
-    attackFlPer100 *
-    (attackLength / 100);
-
-  const totalSupplyFlow =
-    attackFlow * attackLines;
-
-  let automaticApplianceLoss = 0;
-
-if (
-  (
-    state.splitLay.appliance === "gatedWye" ||
-    state.splitLay.appliance === "gateValve"
-  ) &&
-  totalSupplyFlow > 350
-) {
-  automaticApplianceLoss = 10;
-}
-
-if (state.splitLay.appliance === "standpipe") {
-  automaticApplianceLoss = 25;
-}
-  if (automaticApplianceLoss > 0) {
-
-  warnings.push(
-    `${automaticApplianceLoss} psi automatic appliance loss added for ${state.splitLay.appliance === "standpipe"
-      ? "standpipe operations"
-      : "flow greater than 350 GPM"}`
-  );
-
-}
-
-  const supplyQ =
-    totalSupplyFlow / 100;
-
-  const supplyFlPer100 =
-  getActiveHoseCoefficient(supplyHose.id) *
-  supplyQ *
-  supplyQ;
-
-  const supplyTotalFl =
-    supplyFlPer100 *
-    (supplyLength / 100);
-
-  const totalPdp =
-  nozzlePressure +
-  attackTotalFl +
-  supplyTotalFl +
-  applianceLoss +
-  automaticApplianceLoss;
-    const nozzleReaction =
-  state.splitLay.attackNozzleType === "smoothbore"
-    ? (() => {
-        const tip = SMOOTHBORE_TIPS.find(
-          item => item.id === state.splitLay.attackSmoothboreTip
-        );
-
-        if (!tip) return "—";
-
-        return `${Math.round(
-          1.57 * tip.diameter * tip.diameter * nozzlePressure
-        )} lb`;
-      })()
-    : `${Math.round(
-        0.0505 * attackFlow * Math.sqrt(nozzlePressure)
-      )} lb`;
-
-  
-  setResult(
-  Math.round(totalPdp),
-
-  `${Math.round(totalSupplyFlow)} GPM`,
-
-  `${Math.round(
-    attackTotalFl + supplyTotalFl
-  )} psi total`,
-
-  `${Math.round(supplyTotalFl)} supply / ${Math.round(
-    attackTotalFl
-  )} attack`,
-
-  `${Math.round(attackFlow)} GPM / line`,
-
-  `${attackLines} Attack Line(s)`,
-
-  nozzleReaction
-);
-
-  renderWarnings(warnings);
-
-}
     // ========================================
     // VALIDATION
     // ========================================
