@@ -3994,10 +3994,10 @@ if (!actualAttack2) {
 } else if (pressureDifference <= 2) {
 
   els.splitAttack1PressureTag.textContent =
-    "EQUAL PRESSURE";
+    "BALANCED";
 
   els.splitAttack2PressureTag.textContent =
-    "EQUAL PRESSURE";
+    "BALANCED";
 
 } else if (
   actualAttack1.actualNozzlePressure >
@@ -4005,18 +4005,18 @@ if (!actualAttack2) {
 ) {
 
   els.splitAttack1PressureTag.textContent =
-    "HIGH PRESSURE";
+    "DRIVING LINE";
 
   els.splitAttack2PressureTag.textContent =
-    "LOW PRESSURE";
+    "RECALCULATED";
 
 } else {
 
   els.splitAttack1PressureTag.textContent =
-    "LOW PRESSURE";
+    "RECALCULATED";
 
   els.splitAttack2PressureTag.textContent =
-    "HIGH PRESSURE";
+    "DRIVING LINE";
 
 }
 
