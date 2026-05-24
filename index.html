@@ -3268,7 +3268,7 @@ function calculateRelayPdp({
 function calculateSplitLay(warnings) {
 
   const sectionCount = state.splitLay.sectionCount;
-  const supplyLayout = state.splitLay.supplyLayout;
+  const dualSupply = state.splitLay.dualSupply;
   const attackLines = parseInt(state.splitLay.attackLines, 10) || 1;
 
   const supply1Length =
@@ -3348,9 +3348,9 @@ function calculateSplitLay(warnings) {
   let supply1Coefficient =
     getActiveHoseCoefficient(supply1Hose.id);
 
-  if (supplyLayout === "dual") {
-    supply1Coefficient = supply1Coefficient / 4;
-  }
+  if (dualSupply) {
+  supply1Coefficient = supply1Coefficient / 4;
+}
 
   const supply1FlPer100 =
     supply1Coefficient *
@@ -3395,9 +3395,9 @@ const actualAttack2 =
     warnings.push("Estimated Appliance 2 loss applied: 10 psi at flows ≥350 GPM.");
   }
 
-  if (supplyLayout === "dual") {
-    warnings.push("Dual supply assumes matching hose size and matching hose length.");
-  }
+  if (dualSupply) {
+  warnings.push("Dual supply assumes matching hose size and matching hose length.");
+}
 
   if (attackLines === 2 && attack2) {
     const attackDifference =
@@ -3440,8 +3440,8 @@ const actualAttack2 =
   ? `L1 ${Math.round(actualAttack1.actualFlow)} GPM @ ${Math.round(actualAttack1.actualNozzlePressure)} psi
 L2 ${Math.round(actualAttack2.actualFlow)} GPM @ ${Math.round(actualAttack2.actualNozzlePressure)} psi`
   : `${Math.round(actualAttack1.actualFlow)} GPM @ ${Math.round(actualAttack1.actualNozzlePressure)} psi`,
-    supplyLayout === "dual"
-      ? `Dual ${supply1Hose.label} Supply`
+    dualSupply
+  ? `Dual ${supply1Hose.label} Supply`
       : `${supply1Length}' ${supply1Hose.label} Supply`,
     attackLines === 2
   ? `${actualAttack1.actualReaction} / ${actualAttack2.actualReaction}`
