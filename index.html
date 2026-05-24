@@ -864,11 +864,14 @@ button:active:not(:disabled) {
 
     /* ---------- Warnings / Footer ---------- */
     .warnings {
-      background: var(--warning-bg);
-      border-color: var(--warning-border);
-      color: var(--warning-text);
-      padding: 16px;
-    }
+  background: rgba(249, 115, 22, 0.12);
+  border-left: 6px solid var(--warning-border);
+  border-top-color: var(--border);
+  border-right-color: var(--border);
+  border-bottom-color: var(--border);
+  color: var(--warning-text);
+  padding: 14px 16px;
+}
 
     .warning-item {
       display: flex;
