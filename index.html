@@ -412,6 +412,9 @@ button:active:not(:disabled) {
   #pumpChartButtons button:first-child {
   border-right: 1px solid rgba(255,255,255,0.06);
 }  
+    #pumpChartList div {
+  background: transparent;
+}
 
 .pressure-buttons {
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -2410,6 +2413,7 @@ if (splitAttack2Hose) {
     line-height:0.95;
     margin-bottom:10px;
     letter-spacing:-1px;
+    background:transparent;
   ">
     ${preset.calculatedPdp || "—"} PSI
   </div>
