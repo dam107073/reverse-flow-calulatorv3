@@ -2395,16 +2395,39 @@ const splitSectionCount = splitLay.sectionCount || "2";
 const dualSupply = splitLay.dualSupply ? "Dual Supply 1" : "Single Supply 1";
 
 const splitSupply1 =
-  `S1: ${splitLay.supplyLength || "—"}' ${splitLay.supplyHose || "—"}`;
+  `S1 • ${splitLay.supplyLength || "—"}' ${splitLay.supplyHoseSize || "—"}`;
 
-const splitSupplySummary =
-  `${dualSupply} • ${splitSectionCount === "3" ? "2 Supply Sections" : "1 Supply Section"}<br>${splitSupply1}`;
+const splitSupply2 =
+  splitSectionCount === "3"
+    ? `<br>S2 • ${splitLay.supply2Length || "—"}' ${splitLay.supply2HoseSize || "—"}`
+    : "";
 
-const splitAttackSummary =
-  `${splitAttackCount} Attack Line${splitAttackCount === "2" ? "s" : ""}`;
+const attack1Description =
+  splitLay.attack1NozzleType === "smoothbore"
+    ? `${splitLay.attack1SmoothboreTip || "SB"} SB`
+    : `${splitLay.attack1Flow || "—"} GPM Fog`;
+
+const attack2Description =
+  splitLay.attack2NozzleType === "smoothbore"
+    ? `${splitLay.attack2SmoothboreTip || "SB"} SB`
+    : `${splitLay.attack2Flow || "—"} GPM Fog`;
+
+const splitAttack1 =
+  `A1 • ${splitLay.attack1Length || "—"}' ${splitLay.attack1HoseSize || "—"} • ${attack1Description}`;
+
+const splitAttack2 =
+  splitAttackCount === "2"
+    ? `<br>A2 • ${splitLay.attack2Length || "—"}' ${splitLay.attack2HoseSize || "—"} • ${attack2Description}`
+    : "";
 
 const setupSummary = isSplitLayPreset
-  ? `${splitSupplySummary}<br>${splitAttackSummary}`
+  ? `
+    ${splitSupply1}
+    ${splitSupply2}
+    <br><br>
+    ${splitAttack1}
+    ${splitAttack2}
+  `
   : `${preset.calculatedFlow || "—"} • ${preset.hoseLength || "—"}' ${preset.hoseSize || "—"} • ${nozzleDisplay}`;
 
     return `
