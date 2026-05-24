@@ -3978,11 +3978,11 @@ function calculateSplitSmoothboreReaction(line, nozzlePressure) {
 
   els.splitAttack1FlResult.textContent =
   `${Math.round(actualAttack1.actualTotalFl)} psi`;
-      const pressureDifference =
+    const pressureDifference =
   actualAttack2
     ? Math.abs(
-        actualAttack1.actualNozzlePressure -
-        actualAttack2.actualNozzlePressure
+        actualAttack1.requiredPdp -
+        actualAttack2.requiredPdp
       )
     : 0;
 
@@ -4000,12 +4000,12 @@ if (!actualAttack2) {
     "BALANCED";
 
 } else if (
-  actualAttack1.actualNozzlePressure >
-  actualAttack2.actualNozzlePressure
+  actualAttack1.requiredPdp >
+  actualAttack2.requiredPdp
 ) {
 
   els.splitAttack1PressureTag.textContent =
-    "DRIVING LINE";
+    "PDP DRIVING LINE";
 
   els.splitAttack2PressureTag.textContent =
     "RECALCULATED";
@@ -4016,7 +4016,7 @@ if (!actualAttack2) {
     "RECALCULATED";
 
   els.splitAttack2PressureTag.textContent =
-    "DRIVING LINE";
+    "PDP DRIVING LINE";
 
 }
 
