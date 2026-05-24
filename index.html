@@ -282,32 +282,50 @@ button:active:not(:disabled) {
   grid-template-columns: 1fr 1fr;
   gap: 0;
 
-  padding: 4px;
+  padding: 0;
   border: 1px solid var(--border);
   border-radius: 18px;
 
   background: rgba(255,255,255,0.04);
+  overflow: hidden;
 }
 
 #splitSectionButtons button {
+  position: relative;
+
   border: none;
-  border-radius: 14px;
-  min-height: 52px;
+  border-radius: 0;
+  min-height: 56px;
+
+  background: transparent;
   box-shadow: none;
 }
 
-#splitSectionButtons button:not(.active) {
-  background: transparent;
+#splitSectionButtons button.active {
+  background: var(--button);
+  color: var(--button-text);
+  box-shadow: none;
 }
 
+/* Diagonal split when 2 Sections is active */
+#splitSectionButtons button:first-child.active {
+  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 100%, 0 100%);
+}
+
+/* Diagonal split when 3 Sections is active */
+#splitSectionButtons button:last-child.active {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 28px 100%);
+}
+
+/* Pull buttons slightly together so diagonal overlaps cleanly */
 #splitSectionButtons button:first-child {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  margin-right: -14px;
+  z-index: 2;
 }
 
 #splitSectionButtons button:last-child {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  margin-left: -14px;
+  z-index: 1;
 }
 
 .pressure-buttons {
@@ -991,7 +1009,7 @@ Select a hydraulic calculation mode.
    <div class="field full">
   <label class="split-inline-toggle">
     <input type="checkbox" id="splitDualSupplyToggle" />
-    <span>Split this section into matching dual supply lines?</span>
+    <span>Split Section 1 into matching dual supply lines?<span>
   </label>
 </div>
       <p class="helper">
