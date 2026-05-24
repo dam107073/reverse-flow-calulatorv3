@@ -670,6 +670,20 @@ button:active:not(:disabled) {
   letter-spacing: 0.06em;
   white-space: nowrap;
 }
+    .pressure-path-tag.driver {
+  background: rgba(249, 115, 22, 0.18);
+  color: #f97316;
+}
+
+.pressure-path-tag.recalculated {
+  background: rgba(250, 204, 21, 0.18);
+  color: #ca8a04;
+}
+
+.pressure-path-tag.balanced {
+  background: rgba(34, 197, 94, 0.16);
+  color: #16a34a;
+}
   .supply-1-title {
   border-left-color: #3b82f6;
 }
@@ -4005,15 +4019,24 @@ function calculateSplitSmoothboreReaction(line, nozzlePressure) {
 if (!actualAttack2) {
 
   els.splitAttack1PressureTag.textContent =
-    "SINGLE LINE";
+  "SINGLE LINE";
+
+els.splitAttack1PressureTag.className =
+  "pressure-path-tag balanced";
 
 } else if (pressureDifference <= 2) {
 
-  els.splitAttack1PressureTag.textContent =
-    "BALANCED";
+ els.splitAttack1PressureTag.textContent =
+  "BALANCED";
 
-  els.splitAttack2PressureTag.textContent =
-    "BALANCED";
+els.splitAttack1PressureTag.className =
+  "pressure-path-tag balanced";
+
+els.splitAttack2PressureTag.textContent =
+  "BALANCED";
+
+els.splitAttack2PressureTag.className =
+  "pressure-path-tag balanced";
 
 } else if (
   actualAttack1.requiredPdp >
@@ -4022,17 +4045,27 @@ if (!actualAttack2) {
 
   els.splitAttack1PressureTag.textContent =
     "PDP DRIVING LINE";
+  els.splitAttack1PressureTag.className =
+  "pressure-path-tag driver";
 
   els.splitAttack2PressureTag.textContent =
     "RECALCULATED";
+  els.splitAttack2PressureTag.className =
+  "pressure-path-tag recalculated";
 
 } else {
 
   els.splitAttack1PressureTag.textContent =
-    "RECALCULATED";
+  "RECALCULATED";
 
-  els.splitAttack2PressureTag.textContent =
-    "PDP DRIVING LINE";
+els.splitAttack1PressureTag.className =
+  "pressure-path-tag recalculated";
+
+els.splitAttack2PressureTag.textContent =
+  "PDP DRIVING LINE";
+
+els.splitAttack2PressureTag.className =
+  "pressure-path-tag driver";
 
 }
 
