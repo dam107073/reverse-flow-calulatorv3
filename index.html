@@ -717,6 +717,11 @@ button:active:not(:disabled) {
 .split-result-item {
   padding: 12px;
   border-right: 1px solid var(--border);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 92px;
 }
 
 .split-result-item:last-child {
@@ -739,6 +744,7 @@ button:active:not(:disabled) {
   letter-spacing: -0.03em;
   white-space: pre-line;
   overflow-wrap: anywhere;
+  font-weight: 850;
 }
     .split-result-item strong.overpressure {
   color: #fb923c;
@@ -1506,28 +1512,28 @@ Select a hydraulic calculation mode.
     </div>
 
       <div class="split-result-title attack-1-title">
-      <span>Attack Line 1 • Actual Delivered Conditions</span>
+      <span>Attack Line 1 • Delivered Conditions</span>
       <span id="splitAttack1PressureTag" class="pressure-path-tag">—</span>
     </div>
 
       <div class="split-result-details">
 
         <div class="split-result-item">
-          <p>Actual Delivered Flow</p>
+          <p>Delivered Flow</p>
           <strong id="splitAttack1FlowResult">—</strong>
         </div>
 
         <div class="split-result-item">
-          <p>Actual Nozzle Pressure</p>
+          <p>Nozzle Pressure</p>
           <strong id="splitAttack1NpResult">—</strong>
         </div>
 
         <div class="split-result-item">
-          <p>Actual Attack FL</p>
+          <p>Attack FL</p>
           <strong id="splitAttack1FlResult">—</strong>
         </div>
         <div class="split-result-item">
-          <p>Actual Nozzle Reaction</p>
+          <p>Nozzle Reaction</p>
           <strong id="splitAttack1ReactionResult">—</strong>
         </div>
 
@@ -1542,28 +1548,28 @@ Select a hydraulic calculation mode.
     >
 
       <div class="split-result-title attack-2-title">
-      <span>Attack Line 2 • Actual Delivered Conditions</span>
+      <span>Attack Line 2 • Delivered Conditions</span>
       <span id="splitAttack2PressureTag" class="pressure-path-tag">—</span>
     </div>
 
       <div class="split-result-details">
 
         <div class="split-result-item">
-          <p>Actual Delivered Flow</p>
+          <p>Delivered Flow</p>
           <strong id="splitAttack2FlowResult">—</strong>
         </div>
 
         <div class="split-result-item">
-          <p>Actual Nozzle Pressure</p>
+          <p>Nozzle Pressure</p>
           <strong id="splitAttack2NpResult">—</strong>
         </div>
 
         <div class="split-result-item">
-          <p>Actual Attack FL</p>
+          <p>Attack FL</p>
           <strong id="splitAttack2FlResult">—</strong>
         </div>
         <div class="split-result-item">
-          <p>Actual Nozzle Reaction</p>
+          <p>Nozzle Reaction</p>
           <strong id="splitAttack2ReactionResult">—</strong>
         </div>
 
