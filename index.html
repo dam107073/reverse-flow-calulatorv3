@@ -684,6 +684,15 @@ button:active:not(:disabled) {
   background: #16a34a;
   color: white;
 }
+    .split-section-divider {
+  margin-bottom: 14px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  opacity: 0.72;
+}
   .supply-1-title {
   border-left-color: #3b82f6;
 }
@@ -1427,6 +1436,9 @@ Select a hydraulic calculation mode.
   <div class="split-results-grid">
 
     <div class="split-result-section">
+      <div class="split-section-divider">
+      SUPPLY LINES
+    </div>
 
       <div class="split-result-title supply-1-title">
         Supply Section 1
@@ -1489,6 +1501,9 @@ Select a hydraulic calculation mode.
 </div>
 
     <div class="split-result-section">
+      <div class="split-section-divider">
+      ATTACK LINES
+    </div>
 
       <div class="split-result-title attack-1-title">
       <span>Attack Line 1 • Actual Delivered Conditions</span>
@@ -3553,7 +3568,7 @@ const actualAttack2 =
 
     if (attackDifference > 5) {
       warnings.push(
-        "Unequal attack line configurations detected. The lower-pressure side may be overpumped. Verify flow and nozzle pressure manually."
+        "One attack line has a lower hydraulic demand than the PDP-driving line, resulting in increased nozzle pressure and flow on that line."
       );
     }
   }
