@@ -3786,9 +3786,29 @@ function calculateSplitLay(warnings) {
 
   if (attackLines === 2 && !attack2) return;
 
-  const totalAttackFlow =
-    attack1.flow + (attack2 ? attack2.flow : 0);
+  
 
+  const highestAttackSidePdp =
+    Math.max(
+      attack1.requiredPdp,
+      attack2 ? attack2.requiredPdp : 0
+    );
+  const actualAttack1 =
+  calculateActualSplitLine(
+    attack1,
+    highestAttackSidePdp
+  );
+
+const actualAttack2 =
+  attack2
+    ? calculateActualSplitLine(
+        attack2,
+        highestAttackSidePdp
+      )
+    : null;
+  const totalAttackFlow =
+  actualAttack1.actualFlow +
+  (actualAttack2 ? actualAttack2.actualFlow : 0);
   const appliance1Loss =
     getSplitApplianceLoss(
       state.splitLay.appliance1,
@@ -3853,25 +3873,6 @@ function calculateSplitLay(warnings) {
     supply1FlPer100 *
     (supply1Length / 100);
 
-  const highestAttackSidePdp =
-    Math.max(
-      attack1.requiredPdp,
-      attack2 ? attack2.requiredPdp : 0
-    );
-  const actualAttack1 =
-  calculateActualSplitLine(
-    attack1,
-    highestAttackSidePdp
-  );
-
-const actualAttack2 =
-  attack2
-    ? calculateActualSplitLine(
-        attack2,
-        highestAttackSidePdp
-      )
-    : null;
-
   const totalPdp =
     highestAttackSidePdp +
     supply2TotalFl +
@@ -3918,16 +3919,16 @@ const actualAttack2 =
     `${Math.round(
   supply1TotalFl +
   supply2TotalFl +
-  actualAttack1.totalFl +
-  (actualAttack2 ? actualAttack2.totalFl : 0)
+  actualAttack1.actualTotalFl +
+  (actualAttack2 ? actualAttack2.actualTotalFl : 0)
 )} psi total`,
     sectionCount === "3"
   ? attackLines === 2
-  ? `S1 ${Math.round(supply1TotalFl)} / S2 ${Math.round(supply2TotalFl)} / L1 ${Math.round(actualAttack1.totalFl)} / L2 ${Math.round(actualAttack2.totalFl)}`
-  : `S1 ${Math.round(supply1TotalFl)} / S2 ${Math.round(supply2TotalFl)} / A ${Math.round(actualAttack1.totalFl)}`
+  ? `S1 ${Math.round(supply1TotalFl)} / S2 ${Math.round(supply2TotalFl)} / L1 ${Math.round(actualAttack1.actualTotalFl)} / L2 ${Math.round(actualAttack2.actualTotalFl)}`
+  : `S1 ${Math.round(supply1TotalFl)} / S2 ${Math.round(supply2TotalFl)} / A ${Math.round(actualAttack1.actualTotalFl)}`
   : attackLines === 2
-  ? `S ${Math.round(supply1TotalFl)} / L1 ${Math.round(actualAttack1.totalFl)} / L2 ${Math.round(actualAttack2.totalFl)}`
-  : `S ${Math.round(supply1TotalFl)} / A ${Math.round(actualAttack1.totalFl)}`,
+  ? `S ${Math.round(supply1TotalFl)} / L1 ${Math.round(actualAttack1.actualTotalFl)} / L2 ${Math.round(actualAttack2.actualTotalFl)}`
+  : `S ${Math.round(supply1TotalFl)} / A ${Math.round(actualAttack1.actualTotalFl)}`,
    attackLines === 2
   ? `L1 ${Math.round(actualAttack1.actualFlow)} GPM @ ${Math.round(actualAttack1.actualNozzlePressure)} psi
 L2 ${Math.round(actualAttack2.actualFlow)} GPM @ ${Math.round(actualAttack2.actualNozzlePressure)} psi`
