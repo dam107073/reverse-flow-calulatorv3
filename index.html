@@ -1307,7 +1307,7 @@ Select a hydraulic calculation mode.
   </div>
 
 </section>
-    <section class="card">
+   <section id="standardResultsCard" class="card">
       <div class="result-top">
         <p class="result-label" id="primaryResultLabel">Rounded Flow</p>
         <div class="result-number">
@@ -1723,6 +1723,7 @@ function isModifiedHoseCoefficient(hoseId) {
       saveCoefficientDefaultButton: document.getElementById("saveCoefficientDefaultButton"),
       coefficientHelper: document.getElementById("coefficientHelper"),
 
+      standardResultsCard: document.getElementById("standardResultsCard"),
       primaryResultLabel: document.getElementById("primaryResultLabel"),
       primaryResultUnit: document.getElementById("primaryResultUnit"),
       calculatedLabel: document.getElementById("calculatedLabel"),
@@ -1739,6 +1740,18 @@ function isModifiedHoseCoefficient(hoseId) {
       nozzleReaction: document.getElementById("nozzleReaction"),
       setupDisplay: document.getElementById("setupDisplay"),
       warningsCard: document.getElementById("warningsCard"),
+      splitResultsCard: document.getElementById("splitResultsCard"),
+      splitPrimaryPdp: document.getElementById("splitPrimaryPdp"),
+      splitSupplyFlow: document.getElementById("splitSupplyFlow"),
+      splitSupplyLoss: document.getElementById("splitSupplyLoss"),
+      splitApplianceLoss: document.getElementById("splitApplianceLoss"),
+      splitAttack1FlowResult: document.getElementById("splitAttack1FlowResult"),
+      splitAttack1NpResult: document.getElementById("splitAttack1NpResult"),
+      splitAttack1FlResult: document.getElementById("splitAttack1FlResult"),
+      splitAttack2ResultSection: document.getElementById("splitAttack2ResultSection"),
+      splitAttack2FlowResult: document.getElementById("splitAttack2FlowResult"),
+      splitAttack2NpResult: document.getElementById("splitAttack2NpResult"),
+      splitAttack2FlResult: document.getElementById("splitAttack2FlResult"),
 
       splitLayButton: document.getElementById("splitLayButton"),
       proModal: document.getElementById("proModal"),
@@ -2196,6 +2209,14 @@ els.nozzlePressureLabel.closest(".field").style.display =
 
 if (splitLayFields) {
   splitLayFields.style.display = isSplitLayMode() ? "grid" : "none";
+}
+
+if (els.splitResultsCard) {
+  els.splitResultsCard.hidden = !isSplitLayMode();
+}
+
+if (els.standardResultsCard) {
+  els.standardResultsCard.hidden = isSplitLayMode();
 }
 
 syncSplitLayUi();
