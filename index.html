@@ -372,6 +372,49 @@ button:active:not(:disabled) {
   margin-left: -14px;
   z-index: 1;
 }
+    #pumpChartButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+
+  margin-top: 10px;
+
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+
+#pumpChartButtons button {
+  position: relative;
+
+  border: none;
+  border-radius: 0;
+  min-height: 54px;
+
+  background: transparent;
+  box-shadow: none;
+}
+
+#pumpChartButtons button.active {
+  background: rgba(90, 125, 155, 0.42);
+
+  color: #dfefff;
+
+  backdrop-filter: blur(6px);
+
+  box-shadow:
+    inset 0 0 0 1px rgba(140,180,220,0.18),
+    0 0 18px rgba(90,125,155,0.12);
+}
+
+  #pumpChartButtons button:first-child {
+  border-right: 1px solid rgba(255,255,255,0.06);
+}  
+    #pumpChartList div {
+  background: transparent;
+}
 
 .pressure-buttons {
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -433,7 +476,8 @@ button:active:not(:disabled) {
   padding: 28px;
   box-shadow: 0 30px 60px rgba(0,0,0,0.35);
   position: relative;
-  overflow: hidden;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
 }
   .pro-modal-content::after {
   content: "";
@@ -494,6 +538,37 @@ button:active:not(:disabled) {
   color: var(--accent);
   font-weight: 800;
   font-size: 14px;
+}
+    @media (max-width: 720px) {
+
+  #pumpChartModal {
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
+  }
+
+  #pumpChartModal .pro-modal-content {
+    width: 100%;
+    max-height: 100vh;
+    min-height: 100vh;
+
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+
+    padding: 20px 16px calc(32px + env(safe-area-inset-bottom));
+
+    overflow-y: auto;
+  }
+
+  #pumpChartModal .pro-modal-header {
+    align-items: flex-start;
+  }
+
+  #pumpChartModal .pro-modal-header h2 {
+    font-size: 34px;
+  }
+
 }
 
     .split-inline-toggle {
@@ -1080,7 +1155,23 @@ select {
             <option value="">No saved setup selected</option>
           </select>
           <p class="helper">Select a saved hose/nozzle setup to quickly fill the calculator.</p>
-          <button id="savePresetButton" class="small-button" type="button">Save Current Setup</button>
+          <div id="pumpChartButtons">
+
+  <button
+  id="savePresetButton"
+  type="button"
+>
+  Save Setup
+</button>
+
+  <button
+    id="viewPumpChartButton"
+    type="button"
+  >
+    Pump Chart
+  </button>
+
+</div>
         </div>
 
         <div class="field full">
@@ -1718,6 +1809,40 @@ Select a hydraulic calculation mode.
 
   </div>
 </div>
+
+    <div id="pumpChartModal" class="pro-modal" hidden>
+  <div class="pro-modal-content">
+
+    <div class="pro-modal-header">
+
+      <div
+  class="badge beta"
+  style="display:inline-flex;white-space:nowrap;"
+>
+  PUMP CHART
+</div>
+
+      <h2>Pump Chart</h2>
+
+      <button
+        id="closePumpChartModal"
+        class="modal-close-button"
+        type="button"
+      >
+        ✕
+      </button>
+
+    </div>
+
+    <p class="pro-modal-subtitle">
+      Saved operational hose and nozzle setups.
+    </p>
+
+    <div id="pumpChartList" class="pro-feature-list">
+    </div>
+
+  </div>
+</div>
     
     <p class="version-footer">
   Reverse Flow: Fireground Hydraulics © 2026
@@ -1962,6 +2087,18 @@ function isModifiedHoseCoefficient(hoseId) {
       deletePresetButton: document.getElementById("deletePresetButton"),
       resetHoseCoefficientsButton: document.getElementById("resetHoseCoefficientsButton"),
       resetButton: document.getElementById("resetButton"),
+
+      viewPumpChartButton:
+        document.getElementById("viewPumpChartButton"),
+
+      pumpChartModal:
+        document.getElementById("pumpChartModal"),
+
+      closePumpChartModal:
+        document.getElementById("closePumpChartModal"),
+
+      pumpChartList:
+        document.getElementById("pumpChartList"),
 
       reverseModeButton: document.getElementById("reverseModeButton"),
       pdpModeButton: document.getElementById("pdpModeButton"),
@@ -2213,6 +2350,119 @@ if (splitAttack2Hose) {
         )).join("")}
       `;
     }
+
+      function renderPumpChart() {
+
+  const presets = loadPresets();
+
+  if (!presets.length) {
+    els.pumpChartList.innerHTML = `
+      <div class="disabled-note">
+        No saved pump chart setups yet.
+      </div>
+    `;
+    return;
+  }
+
+  els.pumpChartList.innerHTML = presets.map(preset => {
+
+    const nozzleDisplay =
+      preset.nozzleType === "smoothbore"
+        ? `${preset.smoothboreTip || "SB"} Smoothbore`
+        : `Fog @ ${preset.nozzlePressure} psi`;
+
+    return `
+      <div class="section-card" style="margin-bottom:12px;">
+        <div style="
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:4px;
+">
+
+  <strong style="font-size:20px;">
+    ${preset.name}
+  </strong>
+
+  <div style="
+    font-size:12px;
+    font-weight:700;
+    padding:4px 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid var(--border);
+    white-space:nowrap;
+  ">
+    ${
+      preset.nozzleType === "smoothbore"
+        ? "SMOOTHBORE"
+        : "FOG"
+    }
+  </div>
+
+</div>
+<div style="
+  margin-top:18px;
+  margin-bottom:18px;
+">
+
+  <div style="
+    font-size:56px;
+    font-weight:900;
+    line-height:0.95;
+    margin-bottom:10px;
+    letter-spacing:-1px;
+    background:transparent;
+  ">
+    ${preset.calculatedPdp || "—"} PSI
+  </div>
+
+  <div style="
+    font-size:18px;
+    font-weight:700;
+    opacity:0.82;
+    line-height:1.4;
+  ">
+    ${preset.calculatedFlow || "—"} •
+    ${preset.hoseLength || "—"}' ${preset.hoseSize || "—"} •
+    ${nozzleDisplay}
+  </div>
+
+</div>
+
+        <div style="
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+">
+
+  <button
+    class="small-button"
+    style="flex:1;"
+    padding:14px 12px;
+    min-height:52px;
+    onclick="loadPumpChartPreset('${preset.id}')"
+  >
+    Load Setup
+  </button>
+
+  <button
+    class="small-button"
+    style="flex:1;"
+    padding:14px 12px;
+    min-height:52px;
+    onclick="deletePumpChartPreset('${preset.id}')"
+  >
+    Delete
+  </button>
+
+</div>
+      </div>
+    `;
+
+  }).join("");
+}
 
     function renderPressureButtons() {
   if (isSplitLayMode()) {
@@ -2735,6 +2985,32 @@ els.splitLayButton.addEventListener("click", () => {
 els.closeProModal.addEventListener("click", () => {
   els.proModal.hidden = true;
 });
+      els.viewPumpChartButton.addEventListener("click", () => {
+
+  renderPumpChart();
+
+  els.pumpChartModal.hidden = false;
+
+  els.viewPumpChartButton.classList.add("active");
+  els.savePresetButton.classList.remove("active");
+});
+
+els.closePumpChartModal.addEventListener("click", () => {
+
+  els.pumpChartModal.hidden = true;
+
+  els.viewPumpChartButton.classList.remove("active");
+});
+
+els.pumpChartModal.addEventListener("click", event => {
+
+  if (event.target === els.pumpChartModal) {
+
+    els.pumpChartModal.hidden = true;
+
+    els.viewPumpChartButton.classList.remove("active");
+  }
+});
 
 els.proModal.addEventListener("click", event => {
   if (event.target === els.proModal) {
@@ -2745,6 +3021,7 @@ els.proModal.addEventListener("click", event => {
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
     els.proModal.hidden = true;
+    els.pumpChartModal.hidden = true;
   }
 });
 
@@ -3097,6 +3374,16 @@ els.presetSelect.selectedIndex = 0;
     customCoefficient:
       state.customCoefficient || "",
 
+    calculatedPdp:
+  isRequiredPdpMode() || isRelayMode()
+    ? els.roundedGpm.textContent
+    : "",
+
+calculatedFlow:
+  isReverseMode()
+    ? `${els.roundedGpm.textContent} GPM`
+    : els.calculatedGpm.textContent,
+
     splitLay: {
       ...state.splitLay
     }
@@ -3170,6 +3457,41 @@ els.presetSelect.selectedIndex = 0;
   renderPressureButtons();
   calculateAndRender();
 }
+    window.loadPumpChartPreset = function(presetId) {
+
+  applyPreset(presetId);
+
+  els.pumpChartModal.hidden = true;
+};
+
+window.deletePumpChartPreset = function(presetId) {
+
+  const presets = loadPresets();
+
+  const preset = presets.find(
+    item => item.id === presetId
+  );
+
+  if (!preset) return;
+
+  const confirmed = confirm(
+    `Delete "${preset.name}" from Pump Chart?`
+  );
+
+  if (!confirmed) return;
+
+  const updatedPresets =
+    presets.filter(item => item.id !== presetId);
+
+  savePresets(updatedPresets);
+
+  renderPresetOptions();
+  renderPumpChart();
+
+  if (els.presetSelect.value === presetId) {
+    els.presetSelect.value = "";
+  }
+};
 
     function deleteSelectedPreset() {
       const selectedId = els.presetSelect.value;
