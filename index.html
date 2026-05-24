@@ -1497,6 +1497,10 @@ Select a hydraulic calculation mode.
           <p>Actual Attack FL</p>
           <strong id="splitAttack1FlResult">—</strong>
         </div>
+        <div class="split-result-item">
+          <p>Actual Nozzle Reaction</p>
+          <strong id="splitAttack1ReactionResult">—</strong>
+        </div>
 
       </div>
 
@@ -1528,6 +1532,10 @@ Select a hydraulic calculation mode.
         <div class="split-result-item">
           <p>Actual Attack FL</p>
           <strong id="splitAttack2FlResult">—</strong>
+        </div>
+        <div class="split-result-item">
+          <p>Actual Nozzle Reaction</p>
+          <strong id="splitAttack2ReactionResult">—</strong>
         </div>
 
       </div>
@@ -3919,6 +3927,8 @@ function calculateSplitSmoothboreReaction(line, nozzlePressure) {
   els.splitAttack2FlowResult.textContent = "—";
   els.splitAttack2NpResult.textContent = "—";
   els.splitAttack2FlResult.textContent = "—";
+  els.splitAttack1ReactionResult.textContent = "—";
+  els.splitAttack2ReactionResult.textContent = "—";
   els.splitAttack1PressureTag.textContent = "—";
   els.splitAttack2PressureTag.textContent = "—";
 }
@@ -3985,6 +3995,8 @@ function calculateSplitSmoothboreReaction(line, nozzlePressure) {
         actualAttack2.requiredPdp
       )
     : 0;
+      els.splitAttack1ReactionResult.textContent =
+  actualAttack1.actualReaction;
 
 if (!actualAttack2) {
 
@@ -4039,6 +4051,8 @@ if (!actualAttack2) {
 
     els.splitAttack2FlResult.textContent =
      `${Math.round(actualAttack2.actualTotalFl)} psi`;
+    els.splitAttack2ReactionResult.textContent =
+  actualAttack2.actualReaction;
   }
 }
     function setResult(rounded, calculated, total, per100, nozzle, setup, reaction = "-") {
