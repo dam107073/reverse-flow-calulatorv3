@@ -3011,7 +3011,9 @@ function calculateSplitLay(warnings) {
     `${Math.round(
       supply1TotalFl + supply2TotalFl + attack1.totalFl + (attack2 ? attack2.totalFl : 0)
     )} psi total`,
-    `${Math.round(supply1TotalFl)} supply 1 / ${Math.round(supply2TotalFl)} supply 2`,
+    sectionCount === "3"
+  ? `S1 ${Math.round(supply1TotalFl)} / S2 ${Math.round(supply2TotalFl)} / Attack ${Math.round(attack1.totalFl + (attack2 ? attack2.totalFl : 0))}`
+  : `Supply ${Math.round(supply1TotalFl)} / Attack ${Math.round(attack1.totalFl + (attack2 ? attack2.totalFl : 0))}`,
     attackLines === 2
       ? `${Math.round(attack1.flow)} / ${Math.round(attack2.flow)} GPM`
       : `${Math.round(attack1.flow)} GPM`,
