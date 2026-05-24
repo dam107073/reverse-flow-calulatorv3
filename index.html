@@ -1732,9 +1732,12 @@ Select a hydraulic calculation mode.
 
     <div class="pro-modal-header">
 
-      <div class="badge beta">
-        PUMP CHART
-      </div>
+      <div
+  class="badge beta"
+  style="display:inline-flex;white-space:nowrap;"
+>
+  PUMP CHART
+</div>
 
       <h2>Pump Chart</h2>
 
@@ -2291,10 +2294,22 @@ if (splitAttack2Hose) {
           ${preset.name}
         </strong>
 
-        <p class="helper">
-          ${preset.hoseLength || "—"}'
+        <p class="helper" style="margin-bottom:10px;">
+        ${preset.hoseLength || "—"}'
           ${preset.hoseSize || "—"} hose • ${nozzleDisplay}
         </p>
+
+        <div style="
+          font-size:28px;
+          font-weight:800;
+          margin-bottom:6px;
+        ">
+          Pump ${preset.calculatedPdp || "—"} PSI
+        </div>
+
+        <div class="helper" style="margin-bottom:14px;">
+          ${preset.calculatedFlow || "—"}
+        </div>
 
         <button
           class="small-button"
