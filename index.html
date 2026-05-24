@@ -1123,12 +1123,11 @@ select {
           <div id="pumpChartButtons">
 
   <button
-    id="savePresetButton"
-    type="button"
-    class="active"
-  >
-    Save Setup
-  </button>
+  id="savePresetButton"
+  type="button"
+>
+  Save Setup
+</button>
 
   <button
     id="viewPumpChartButton"
@@ -2960,17 +2959,29 @@ els.closeProModal.addEventListener("click", () => {
   els.proModal.hidden = true;
 });
       els.viewPumpChartButton.addEventListener("click", () => {
+
   renderPumpChart();
+
   els.pumpChartModal.hidden = false;
+
+  els.viewPumpChartButton.classList.add("active");
+  els.savePresetButton.classList.remove("active");
 });
 
 els.closePumpChartModal.addEventListener("click", () => {
+
   els.pumpChartModal.hidden = true;
+
+  els.viewPumpChartButton.classList.remove("active");
 });
 
 els.pumpChartModal.addEventListener("click", event => {
+
   if (event.target === els.pumpChartModal) {
+
     els.pumpChartModal.hidden = true;
+
+    els.viewPumpChartButton.classList.remove("active");
   }
 });
 
