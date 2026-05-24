@@ -3389,7 +3389,10 @@ els.presetSelect.selectedIndex = 0;
     }
 
     function buildPresetData() {
+  const isSplit = isSplitLayMode();
+
   return {
+    mode: state.mode || "",
 
     hoseLength: state.hoseLength || "",
     hoseSize: state.hoseSize || "",
@@ -3406,21 +3409,24 @@ els.presetSelect.selectedIndex = 0;
       state.customCoefficient || "",
 
     calculatedPdp:
-  isRequiredPdpMode() || isRelayMode()
-    ? els.roundedGpm.textContent
-    : "",
+      isSplit
+        ? els.splitPrimaryPdp.textContent
+        : isRequiredPdpMode() || isRelayMode()
+          ? els.roundedGpm.textContent
+          : "",
 
-calculatedFlow:
-  isReverseMode()
-    ? `${els.roundedGpm.textContent} GPM`
-    : els.calculatedGpm.textContent,
+    calculatedFlow:
+      isSplit
+        ? "Split Lay"
+        : isReverseMode()
+          ? `${els.roundedGpm.textContent} GPM`
+          : els.calculatedGpm.textContent,
 
     splitLay: {
       ...state.splitLay
     }
   };
 }
-
     function applyPreset(presetId) {
   if (!presetId) return;
 
