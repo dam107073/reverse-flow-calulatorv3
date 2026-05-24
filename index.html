@@ -3109,6 +3109,25 @@ if (!confirmed) return;
   button.addEventListener("click", () => {
     state.splitLay.sectionCount = button.dataset.sections;
 
+    if (state.splitLay.sectionCount === "2") {
+      state.splitLay.supply2Length = "";
+      state.splitLay.supply2HoseSize =
+        DEFAULT_STATE.splitLay.supply2HoseSize;
+      state.splitLay.appliance2 =
+        DEFAULT_STATE.splitLay.appliance2;
+
+      [
+        ["splitSupply2Length", ""],
+        ["splitSupply2Hose", DEFAULT_STATE.splitLay.supply2HoseSize],
+        ["splitAppliance2", DEFAULT_STATE.splitLay.appliance2]
+      ].forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.value = value;
+      });
+
+      clearSplitAttack2State();
+    }
+
     saveState();
     syncSplitLayUi();
     calculateAndRender();
