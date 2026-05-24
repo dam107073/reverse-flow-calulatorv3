@@ -1222,7 +1222,7 @@ Select a hydraulic calculation mode.
     <div class="split-result-section">
 
       <div class="split-result-title">
-        Supply System
+        Supply Section 1
       </div>
 
       <div class="split-result-details">
@@ -1245,6 +1245,36 @@ Select a hydraulic calculation mode.
       </div>
 
     </div>
+    <div
+  id="splitSupply2ResultSection"
+  class="split-result-section"
+  hidden
+>
+
+  <div class="split-result-title">
+    Supply Section 2
+  </div>
+
+  <div class="split-result-details">
+
+    <div class="split-result-item">
+      <p>Section Flow</p>
+      <strong id="splitSupply2Flow">—</strong>
+    </div>
+
+    <div class="split-result-item">
+      <p>Supply 2 FL</p>
+      <strong id="splitSupply2Loss">—</strong>
+    </div>
+
+    <div class="split-result-item">
+      <p>Appliance 2 Loss</p>
+      <strong id="splitAppliance2Loss">—</strong>
+    </div>
+
+  </div>
+
+</div>
 
     <div class="split-result-section">
 
@@ -1745,6 +1775,10 @@ function isModifiedHoseCoefficient(hoseId) {
       splitSupplyFlow: document.getElementById("splitSupplyFlow"),
       splitSupplyLoss: document.getElementById("splitSupplyLoss"),
       splitApplianceLoss: document.getElementById("splitApplianceLoss"),
+      splitSupply2ResultSection: document.getElementById("splitSupply2ResultSection"),
+      splitSupply2Flow: document.getElementById("splitSupply2Flow"),
+      splitSupply2Loss: document.getElementById("splitSupply2Loss"),
+      splitAppliance2Loss: document.getElementById("splitAppliance2Loss"),
       splitAttack1FlowResult: document.getElementById("splitAttack1FlowResult"),
       splitAttack1NpResult: document.getElementById("splitAttack1NpResult"),
       splitAttack1FlResult: document.getElementById("splitAttack1FlResult"),
@@ -2283,6 +2317,17 @@ function syncSplitLayUi() {
     attack2Section.hidden = !showAttack2;
     attack2Section.style.display = showAttack2 ? "grid" : "none";
   }
+  if (els.splitSupply2ResultSection) {
+  const showSupply2Result = state.splitLay.sectionCount === "3";
+  els.splitSupply2ResultSection.hidden = !showSupply2Result;
+  els.splitSupply2ResultSection.style.display = showSupply2Result ? "" : "none";
+}
+
+if (els.splitAttack2ResultSection) {
+  const showAttack2Result = state.splitLay.attackLines === "2";
+  els.splitAttack2ResultSection.hidden = !showAttack2Result;
+  els.splitAttack2ResultSection.style.display = showAttack2Result ? "" : "none";
+}
 
   if (attackSections) {
     attackSections.classList.toggle(
