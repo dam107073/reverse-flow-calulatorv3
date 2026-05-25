@@ -3530,10 +3530,11 @@ els.presetSelect.selectedIndex = 0;
   renderPressureButtons();
   calculateAndRender();
 }
-    window.loadPumpChartPreset = function(presetId) {
+   window.loadPumpChartPreset = function(presetId) {
 
   applyPreset(presetId);
 
+  els.viewPumpChartButton.classList.remove("active");
   els.pumpChartModal.hidden = true;
 };
 
