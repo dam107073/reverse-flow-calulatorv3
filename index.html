@@ -3606,7 +3606,10 @@ function applyPreset(presetId) {
       : state.mode,
 
     pdp: preset.pdp || "",
-    targetGpm: preset.targetGpm || "",
+    targetGpm:
+  preset.targetGpm ||
+  preset.targetFlow ||
+  "",
 
     hoseLength: preset.hoseLength || "",
     hoseSize: preset.hoseSize || state.hoseSize,
