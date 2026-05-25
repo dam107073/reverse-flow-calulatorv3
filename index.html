@@ -3082,9 +3082,26 @@ els.saveCoefficientDefaultButton.textContent =
   alert("Hose coefficients reset to app defaults.");
 });
 
-      els.reverseModeButton.addEventListener("click", () => setMode("reverse"));
-els.pdpModeButton.addEventListener("click", () => setMode("requiredPdp"));
-els.relayModeButton.addEventListener("click", () => setMode("relay"));
+      els.reverseModeButton.addEventListener("click", () => {
+  setMode("reverse");
+  resetSplitLayInputs();
+  syncSplitLayInputsFromState();
+  resetSplitLayResultCard();
+});
+
+els.pdpModeButton.addEventListener("click", () => {
+  setMode("requiredPdp");
+  resetSplitLayInputs();
+  syncSplitLayInputsFromState();
+  resetSplitLayResultCard();
+});
+
+els.relayModeButton.addEventListener("click", () => {
+  setMode("relay");
+  resetSplitLayInputs();
+  syncSplitLayInputsFromState();
+  resetSplitLayResultCard();
+});
 
 els.splitLayButton.addEventListener("click", () => {
   setMode("splitLay");
