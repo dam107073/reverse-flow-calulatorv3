@@ -3354,17 +3354,26 @@ document.querySelectorAll("#splitAttackLineButtons button").forEach(button => {
   syncCoefficientUi();
 }
     function setMode(mode) {
-      
+  const leavingSplitLay =
+    state.mode === "splitLay" && mode !== "splitLay";
+
   state.mode = mode;
   state.customNozzlePressure = "";
   clearCustomCoefficient();
+
+  if (leavingSplitLay) {
+    state.splitLay = {
+      ...DEFAULT_STATE.splitLay
+    };
+
+    resetSplitLayResultCard();
+  }
 
   // ========================================
   // RELAY MODE DEFAULTS
   // ========================================
 
   if (mode === "relay") {
-
     state.pdp = "";
     state.targetGpm = "";
     state.hoseLength = "";
@@ -3376,20 +3385,13 @@ document.querySelectorAll("#splitAttackLineButtons button").forEach(button => {
     state.smoothboreTip = "";
 
     state.applianceLoss = "0";
-
   }
 
   // ========================================
   // STANDARD CALCULATOR DEFAULTS
   // ========================================
- if (mode !== "splitLay") {
-  resetSplitLayInputs();
-  syncSplitLayInputsFromState();
-  resetSplitLayResultCard();
-}
-      
-  if (mode === "reverse" || mode === "requiredPdp") {
 
+  if (mode === "reverse" || mode === "requiredPdp") {
     state.pdp = "";
     state.targetGpm = "";
     state.hoseLength = "";
@@ -3401,7 +3403,6 @@ document.querySelectorAll("#splitAttackLineButtons button").forEach(button => {
     state.smoothboreTip = "";
 
     state.applianceLoss = "0";
-
   }
 
   populateHoseOptions();
@@ -3409,15 +3410,16 @@ document.querySelectorAll("#splitAttackLineButtons button").forEach(button => {
   saveState();
 
   syncInputsFromState();
+  syncSplitLayInputsFromState();
   syncSmoothboreUi();
   syncModeUi();
 
-  
-      renderPressureButtons();
-    calculateAndRender();
-      if (mode !== "splitLay") {
-  resetSplitLayResultCard();
-}
+  renderPressureButtons();
+  calculateAndRender();
+
+  if (leavingSplitLay) {
+    resetSplitLayResultCard();
+  }
 }
 
 function resetCalculator() {
