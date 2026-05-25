@@ -1708,13 +1708,17 @@ Select a hydraulic calculation mode.
 
     <section id="warningsCard" class="card warnings" hidden></section>
 
-    <!-- ========================================
-         FOOTER ACTIONS / INFO
-    ========================================= -->
-    <div class="footer-actions">
-  <button id="deletePresetButton" class="reset-button" type="button">Delete Current Preset</button>
-  <button id="resetHoseCoefficientsButton" class="reset-button" type="button">Reset Hose Coefficients</button>
-  <button id="resetButton" class="reset-button" type="button">↺ Reset</button>
+    <!-- =========================================
+     FOOTER ACTIONS
+========================================= -->
+<div class="footer-actions">
+  <button id="resetHoseCoefficientsButton" class="reset-button" type="button">
+    Reset Hose Coefficients
+  </button>
+
+  <button id="resetButton" class="reset-button" type="button">
+    ↺ Reset
+  </button>
 </div>
 
     <section class="card formula" id="formulaCard">
@@ -2088,7 +2092,6 @@ function isModifiedHoseCoefficient(hoseId) {
     const els = {
       presetSelect: document.getElementById("presetSelect"),
       savePresetButton: document.getElementById("savePresetButton"),
-      deletePresetButton: document.getElementById("deletePresetButton"),
       resetHoseCoefficientsButton: document.getElementById("resetHoseCoefficientsButton"),
       resetButton: document.getElementById("resetButton"),
 
@@ -3058,7 +3061,6 @@ els.saveCoefficientDefaultButton.textContent =
   event.stopPropagation();
   saveCurrentSetupAsPreset();
 });
-      els.deletePresetButton.addEventListener("click", deleteSelectedPreset);
       els.resetButton.addEventListener("click", resetCalculator);
       els.resetHoseCoefficientsButton.addEventListener("click", () => {
   const confirmed = confirm(
