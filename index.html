@@ -3529,11 +3529,13 @@ function resetCalculator() {
       state.customCoefficient || "",
 
     calculatedPdp:
-      isSplit
-        ? els.splitPrimaryPdp.textContent
-        : isRequiredPdpMode() || isRelayMode()
-          ? els.roundedGpm.textContent
-          : "",
+  isSplit
+    ? els.splitPrimaryPdp.textContent.replace(" PSI", "")
+    : isReverseMode()
+      ? state.pdp || ""
+      : isRequiredPdpMode() || isRelayMode()
+        ? els.roundedGpm.textContent
+        : "",
 
     calculatedFlow:
       isSplit
