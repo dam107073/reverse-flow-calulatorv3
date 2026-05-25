@@ -2803,6 +2803,9 @@ if (splitLayFields) {
 if (els.splitResultsCard) {
   els.splitResultsCard.hidden = !isSplitLayMode();
 }
+      if (!isSplitLayMode()) {
+  resetSplitLayResultCard();
+}
 
 if (!isSplitLayMode()) {
   resetSplitLayResultCard();
