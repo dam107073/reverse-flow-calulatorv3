@@ -2470,7 +2470,7 @@ const setupSummary = isSplitLayPreset
             letter-spacing:-1px;
             background:transparent;
           ">
-            ${preset.calculatedPdp || "—"}
+           ${preset.calculatedPdp ? `${preset.calculatedPdp} PSI` : "—"}
           </div>
 
           <div style="
