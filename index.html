@@ -3511,6 +3511,9 @@ function resetCalculator() {
   return {
     mode: state.mode || "",
 
+    pdp: state.pdp || "",
+    targetGpm: state.targetGpm || "",
+
     hoseLength: state.hoseLength || "",
     hoseSize: state.hoseSize || "",
     nozzleType: state.nozzleType || "",
@@ -3591,6 +3594,9 @@ function applyPreset(presetId) {
     mode: isSplitPreset
       ? "splitLay"
       : state.mode,
+
+    pdp: preset.pdp || "",
+    targetGpm: preset.targetGpm || "",
 
     hoseLength: preset.hoseLength || "",
     hoseSize: preset.hoseSize || state.hoseSize,
