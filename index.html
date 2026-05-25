@@ -3601,9 +3601,7 @@ function applyPreset(presetId) {
   state = {
     ...state,
 
-    mode: isSplitPreset
-      ? "splitLay"
-      : state.mode,
+   mode: preset.mode || state.mode,
 
     pdp: preset.pdp || "",
     targetGpm:
