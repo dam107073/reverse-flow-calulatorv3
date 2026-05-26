@@ -2129,7 +2129,7 @@ function isModifiedHoseCoefficient(hoseId) {
       customCoefficient: "",
     };
 
-    let state = loadState();
+    let state = getFreshLaunchState();
 
     // ========================================
     // DOM ELEMENTS
@@ -2285,6 +2285,21 @@ function updateAccessBadge() {
     // ========================================
     // STORAGE
     // ========================================
+    function getFreshLaunchState() {
+  const freshState = {
+    ...DEFAULT_STATE,
+    splitLay: {
+      ...DEFAULT_STATE.splitLay
+    }
+  };
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(freshState)
+  );
+
+  return freshState;
+}
     function loadState() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
