@@ -3887,14 +3887,14 @@ calculateReverseFlow({ ...inputs, warnings });
       }
 
       setResult(
-        roundedGpm,
-        `${Math.round(calculatedGpm)} GPM`,
-        `${Math.round(totalFrictionLoss)} psi`,
-        `${Math.round(frictionLossPer100)} psi`,
-        getNozzleDisplay(),
-        getSetupDisplay(),
-        nozzleReaction
-      );
+  roundedGpm,
+  `${Math.round(calculatedGpm)} GPM`,
+  `${totalFrictionLoss.toFixed(1)} psi`,
+  `${frictionLossPer100.toFixed(1)} psi`,
+  getNozzleDisplay(),
+  getSetupDisplay(),
+  nozzleReaction
+);
 
       renderWarnings(warnings);
     }
