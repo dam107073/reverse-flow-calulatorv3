@@ -453,6 +453,14 @@ button:active:not(:disabled) {
   padding: 3px 6px;
   border-radius: 999px;
 }
+body.pro-user .mode-card-pro::after {
+  display: none;
+}
+
+body.pro-user .mode-card-pro {
+  opacity: 1;
+  border-style: solid;
+}
     .pro-modal {
   position: fixed;
   inset: 0;
@@ -1157,16 +1165,18 @@ select {
   <button
   id="savePresetButton"
   type="button"
+  class="mode-card-pro"
 >
   Save Setup
 </button>
 
   <button
-    id="viewPumpChartButton"
-    type="button"
-  >
-    Pump Chart
-  </button>
+  id="viewPumpChartButton"
+  type="button"
+  class="mode-card-pro"
+>
+  Pump Chart
+</button>
 
 </div>
         </div>
@@ -1253,7 +1263,8 @@ Select a hydraulic calculation mode.
         <select id="splitAppliance1">
           <option value="gatedWye">Gated Wye</option>
           <option value="gateValve">Gate Valve / Nozzle Shutoff</option>
-          <option value="reducer">2.5&quot; to 1.5&quot; Reducer</option>
+          <option value="reducer">Reducer</option>
+          <option value="siamese">Siamese</option>
         </select>
       </div>
 
@@ -1532,8 +1543,9 @@ Select a hydraulic calculation mode.
           <input id="customCoefficient" type="text" step="any" inputmode="decimal" placeholder="Default coefficient" disabled />
 
 <button
+  <button
   id="saveCoefficientDefaultButton"
-  class="small-button"
+  class="small-button mode-card-pro"
   type="button"
   hidden
 >
@@ -1649,7 +1661,7 @@ Select a hydraulic calculation mode.
         </div>
 
         <div class="split-result-item">
-          <p>Actual Line FL</p>
+          <p>Attack Line FL</p>
           <strong id="splitAttack1FlResult">—</strong>
         </div>
         <div class="split-result-item">
@@ -1824,9 +1836,10 @@ Select a hydraulic calculation mode.
 
     <div class="pro-modal-header">
      <div class="badge beta">
-  PRO ACCESS
-</div> 
-      <h2>Reverse Flow PRO</h2>
+  REVERSE FLOW PRO
+</div>
+
+<h2>Professional Hydraulic Tools</h2>
       <button id="closeProModal" class="modal-close-button" type="button">
   ✕
 </button>
@@ -1838,14 +1851,14 @@ Select a hydraulic calculation mode.
 
     <div class="pro-feature-list">
   <div>✓ Advanced Calculations</div>
-  <div>✓ Equipment Catalogs</div>
   <div>✓ PRO Customization</div>
-  <div>✓ Future Module Access</div>
+  <div>✓ Save to Pump Chart</div>
+  <div>✓ ALL FUTURE FEATURES</div>
 </div>
 
     <div class="pro-modal-footer">
   <strong>One-time purchase.</strong>
-  No subscription. Lifetime access to all future PRO modules.
+  No subscription. Lifetime access to all future PRO features.
 </div>
 
   </div>
@@ -1930,13 +1943,40 @@ const ACCESS_LEVELS = {
 };
 
 // Beta testers default to PRO access for now
-let userAccessLevel = ACCESS_LEVELS.PRO_COMPED;
+const ACCESS_LEVEL_STORAGE_KEY =
+  "reverse-flow-access-level";
+
+let userAccessLevel =
+  localStorage.getItem(ACCESS_LEVEL_STORAGE_KEY) ||
+  ACCESS_LEVELS.PRO_COMPED;
 
 function isProUser() {
   return (
     userAccessLevel === ACCESS_LEVELS.PRO ||
     userAccessLevel === ACCESS_LEVELS.PRO_COMPED
   );
+}
+function setAccessLevel(level) {
+  userAccessLevel = level;
+
+  localStorage.setItem(
+    ACCESS_LEVEL_STORAGE_KEY,
+    level
+  );
+
+  document.body.classList.toggle(
+    "pro-user",
+    isProUser()
+  );
+
+  updateAccessBadge();
+}
+function enableProAccess() {
+  setAccessLevel(ACCESS_LEVELS.PRO);
+}
+
+function disableProAccess() {
+  setAccessLevel(ACCESS_LEVELS.BASIC);
 }
 
 // ========================================
@@ -2250,6 +2290,7 @@ function isModifiedHoseCoefficient(hoseId) {
     init();
 
     function init() {
+
   els.versionFooter.textContent =
   `Reverse Flow Calculator v${APP_VERSION} • ${BUILD_DATE}`;
   updateAccessBadge();
@@ -2264,6 +2305,11 @@ function isModifiedHoseCoefficient(hoseId) {
 }
 
 function updateAccessBadge() {
+
+  document.body.classList.toggle(
+    "pro-user",
+    isProUser()
+  );
 
   const badge = document.getElementById("accessBadge");
 
@@ -2322,8 +2368,14 @@ function updateAccessBadge() {
     }
 
     function savePresets(presets) {
-      localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
-    }
+  if (!isProUser()) {
+    openProModal();
+    return false;
+  }
+
+  localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+  return true;
+}
 
     // ========================================
     // UI POPULATION
@@ -3121,9 +3173,15 @@ els.saveCoefficientDefaultButton.textContent =
     if (els.presetSelect) {
   els.presetSelect.addEventListener("change", e => applyPreset(e.target.value));
 }
-      els.savePresetButton.addEventListener("click", event => {
+  els.savePresetButton.addEventListener("click", event => {
   event.preventDefault();
   event.stopPropagation();
+
+  if (!isProUser()) {
+    openProModal();
+    return;
+  }
+
   saveCurrentSetupAsPreset();
 });
       els.invertApplianceLossButton?.addEventListener("click", () => {
@@ -3141,6 +3199,12 @@ els.saveCoefficientDefaultButton.textContent =
 });
       els.resetButton.addEventListener("click", resetCalculator);
       els.resetHoseCoefficientsButton.addEventListener("click", () => {
+
+  if (!isProUser()) {
+    openProModal();
+    return;
+  }
+
   const confirmed = confirm(
     "Reset all hose coefficients back to app defaults?"
   );
@@ -3177,6 +3241,11 @@ els.pdpModeButton.addEventListener("click", () => {
 });
 
 els.relayModeButton.addEventListener("click", () => {
+  if (!isProUser()) {
+    openProModal();
+    return;
+  }
+
   setMode("relay");
   resetSplitLayInputs();
   syncSplitLayInputsFromState();
@@ -3184,17 +3253,30 @@ els.relayModeButton.addEventListener("click", () => {
 });
 
 els.splitLayButton.addEventListener("click", () => {
+  if (!isProUser()) {
+    openProModal();
+    return;
+  }
+
   resetSplitLayInputs();
   resetSplitLayResultCard();
   setMode("splitLay");
   syncSplitLayInputsFromState();
   resetSplitLayResultCard();
 });
+function openProModal() {
+  els.proModal.hidden = false;
+}
 
 els.closeProModal.addEventListener("click", () => {
   els.proModal.hidden = true;
 });
       els.viewPumpChartButton.addEventListener("click", () => {
+
+  if (!isProUser()) {
+    openProModal();
+    return;
+  }
 
   renderPumpChart();
 
@@ -3247,6 +3329,12 @@ document.addEventListener("keydown", event => {
 });
 
       els.saveCoefficientDefaultButton.addEventListener("click", () => {
+
+  if (!isProUser()) {
+    openProModal();
+    return;
+  }
+
   const selectedHose = getSelectedHose();
   const coefficient = numberOrNull(state.customCoefficient);
 
@@ -3548,7 +3636,12 @@ function resetCalculator() {
     // PRESETS
     // ========================================
     function saveCurrentSetupAsPreset() {
-      const name = prompt("Enter a name for this setup:");
+  if (!isProUser()) {
+    openProModal();
+    return;
+  }
+
+  const name = prompt("Enter a name for this setup:");
       if (!name || !name.trim()) return;
 
       const presets = loadPresets();
