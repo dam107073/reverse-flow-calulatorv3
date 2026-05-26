@@ -3845,9 +3845,26 @@ calculateReverseFlow({ ...inputs, warnings });
 
       if (!validateCommonInputs({ hoseLength, coefficient, warnings })) return;
 
-      if (pdp < nozzlePressure) {
-        warnings.push("PDP is lower than nozzle pressure. Check the inputs.");
-      }
+      if (pdp <= nozzlePressure + applianceLoss) {
+
+  warnings.push(
+    "PDP must exceed nozzle pressure and appliance/elevation loss."
+  );
+
+  setResult(
+    "—",
+    "—",
+    "IMPOSSIBLE",
+    "—",
+    getNozzleDisplay(),
+    getSetupDisplay(),
+    "—"
+  );
+
+  renderWarnings(warnings);
+
+  return;
+}
 
       const totalFrictionLoss = pdp - nozzlePressure - applianceLoss;
 
@@ -3939,14 +3956,14 @@ calculateReverseFlow({ ...inputs, warnings });
       }
 
       setResult(
-        roundedRequiredPdp,
-        `${Math.round(targetGpm)} GPM`,
-        `${Math.round(totalFrictionLoss)} psi`,
-        `${Math.round(frictionLossPer100)} psi`,
-        getNozzleDisplay(),
-        getSetupDisplay(),
-        nozzleReaction
-      );
+  roundedRequiredPdp,
+  `${Math.round(targetGpm)} GPM`,
+  `${totalFrictionLoss.toFixed(1)} psi`,
+  `${frictionLossPer100.toFixed(1)} psi`,
+  getNozzleDisplay(),
+  getSetupDisplay(),
+  nozzleReaction
+);
 
       renderWarnings(warnings);
     }
