@@ -4020,14 +4020,14 @@ function calculateRelayPdp({
   }
 
   setResult(
-    Math.round(requiredRelayPdp),
-    `${Math.round(targetGpm)} GPM`,
-    `${Math.round(totalFrictionLoss)} psi`,
-    `${Math.round(frictionLossPer100)} psi`,
-    `${residualPressure} psi residual`,
-    `${hoseLength}' Relay Distance`,
-    "—"
-  );
+  Math.round(requiredRelayPdp),
+  `${Math.round(targetGpm)} GPM`,
+  `${totalFrictionLoss.toFixed(1)} psi`,
+  `${frictionLossPer100.toFixed(1)} psi`,
+  `${residualPressure} psi residual`,
+  `${hoseLength}' Relay Distance`,
+  "—"
+);
 
   renderWarnings(warnings);
 }
