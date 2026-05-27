@@ -1454,13 +1454,21 @@ Select a hydraulic calculation mode.
         <div class="field">
           <label for="nozzleType" id="nozzleTypeLabel">Nozzle Style</label>
           <select id="nozzleType">
-            <option value="fog">Fog</option>
-            <option value="smoothbore">Smoothbore</option>
-          </select>
+          <option value="fog">Fog</option>
+          <option value="smoothbore">Smoothbore</option>
+          <option value="masterstream">Master Stream</option>
+</select>
           <p class="helper">
   Only nozzle style, nozzle pressure, and hose coefficient matter for these calculations.
 </p>
         </div>
+        <div id="masterStreamTypeField" class="field full" hidden>
+  <label for="masterStreamType">Master Stream Type</label>
+  <select id="masterStreamType">
+    <option value="fog">Fog</option>
+    <option value="smoothbore">Smoothbore</option>
+  </select>
+</div>
 
         <div id="smoothboreTipField" class="field full" hidden>
           <label for="smoothboreTip">Smoothbore Tip Size</label>
@@ -1497,6 +1505,20 @@ Select a hydraulic calculation mode.
         </div>
 
          <div class="section-divider"></div>
+
+         <div id="masterStreamLossField" class="field full" hidden>
+  <label for="masterStreamLoss">Master Stream Device Loss</label>
+
+  <input
+    id="masterStreamLoss"
+    inputmode="numeric"
+    placeholder="25"
+  />
+
+  <p class="helper">
+    Default is 25 psi. Change only if your device has been flow tested.
+  </p>
+</div>
           
 
   <div class="field">
@@ -1555,6 +1577,16 @@ Select a hydraulic calculation mode.
         </div>
       </div>
     </section>
+
+    <div id="dualLineSupplyField" class="field full" hidden>
+  <label class="split-inline-toggle">
+    <input type="checkbox" id="dualLineSupplyToggle" />
+    <span>Split supply into matching dual lines?</span>
+  </label>
+  <p class="helper">
+    Splits total flow evenly across two identical supply lines for friction loss calculation.
+  </p>
+</div>
 
     <!-- ========================================
          RESULTS
@@ -2101,12 +2133,20 @@ function isModifiedHoseCoefficient(hoseId) {
 
     function getNozzlePressures() {
 
+  if (state.nozzleType === "masterstream") {
+    return {
+      fog: [50, 55, 75, 100, "custom"],
+      smoothbore: [40, 50, 60, "custom"],
+      masterstream: [50, 60, 70, 80, 90, 100, "custom"]
+    };
+  }
+
   return {
     fog: [50, 55, 75, 100, "custom"],
 
     smoothbore: isReverseMode()
-      ? [40, 50, 60, 80]
-      : [40, 50, 60, 80, "custom"],
+      ? [40, 50, 60,]
+      : [40, 50, 60, "custom"],
   };
 
 }
@@ -2119,6 +2159,10 @@ function isModifiedHoseCoefficient(hoseId) {
       { id: '1-1/8', label: '1 1/8"', diameter: 1.125 },
       { id: '1-3/16', label: '1 3/16"', diameter: 1.1875 },
       { id: '1-1/4', label: '1 1/4"', diameter: 1.25 },
+      { id: '1-3/8', label: '1 3/8"', diameter: 1.375 },
+      { id: '1-1/2', label: '1 1/2"', diameter: 1.5 },
+      { id: '1-3/4', label: '1 3/4"', diameter: 1.75 },
+      { id: '2', label: '2"', diameter: 2 },
     ];
 
     // ========================================
@@ -2131,8 +2175,14 @@ function isModifiedHoseCoefficient(hoseId) {
       hoseLength: "",
       hoseSize: "1.88",
       nozzleType: "fog",
+
+      masterStreamType: "fog",
+      masterStreamLoss: "25",
+      dualLineSupply: false,
+
       nozzlePressure: "55",
       customNozzlePressure: "",
+
       smoothboreTip: "",
       applianceLoss: "0",
       splitLay: {
@@ -2202,6 +2252,22 @@ function isModifiedHoseCoefficient(hoseId) {
       hoseSize: document.getElementById("hoseSize"),
       nozzleTypeLabel: document.getElementById("nozzleTypeLabel"),
       nozzleType: document.getElementById("nozzleType"),
+      masterStreamTypeField:
+      document.getElementById("masterStreamTypeField"),
+
+      masterStreamType:
+      document.getElementById("masterStreamType"),
+
+      dualLineSupplyField:
+      document.getElementById("dualLineSupplyField"),
+
+      dualLineSupplyToggle:
+      document.getElementById("dualLineSupplyToggle"),
+      masterStreamLossField:
+      document.getElementById("masterStreamLossField"),
+
+      masterStreamLoss:
+      document.getElementById("masterStreamLoss"),
       smoothboreTipField: document.getElementById("smoothboreTipField"),
       smoothboreTip: document.getElementById("smoothboreTip"),
 
@@ -2456,10 +2522,25 @@ if (splitAttack2Hose) {
 }
 
     function populateSmoothboreTips() {
-      els.smoothboreTip.innerHTML = SMOOTHBORE_TIPS.map(tip => (
-        `<option value="${tip.id}">${tip.label}</option>`
-      )).join("");
-    }
+  const tips = isMasterStream()
+    ? SMOOTHBORE_TIPS.filter(tip =>
+        tip.diameter >= 1.25 &&
+        tip.diameter <= 2
+      )
+    : SMOOTHBORE_TIPS.filter(tip =>
+        tip.diameter >= 0.75 &&
+        tip.diameter <= 1.25
+      );
+
+  els.smoothboreTip.innerHTML = tips.map(tip => (
+    `<option value="${tip.id}">${tip.label}</option>`
+  )).join("");
+
+  if (!tips.some(tip => tip.id === state.smoothboreTip)) {
+    state.smoothboreTip = tips[0]?.id || "";
+    els.smoothboreTip.value = state.smoothboreTip;
+  }
+}
 
     function renderPresetOptions() {
   if (!els.presetSelect) return;
@@ -2684,8 +2765,12 @@ if (usingCustomPressure) {
   els.customNozzlePressure.value = "";
 }
 
-      const pressures = getNozzlePressures()[state.nozzleType];
+  const pressureKey =
+  isMasterStream()
+    ? "masterstream"
+    : state.nozzleType;
 
+  const pressures = getNozzlePressures()[pressureKey];
       els.pressureButtons.innerHTML = pressures.map(pressure => {
         const isActive = state.nozzlePressure === String(pressure);
         return `
@@ -2751,6 +2836,14 @@ if (usingCustomPressure) {
       els.hoseLength.value = state.hoseLength;
       els.hoseSize.value = state.hoseSize;
       els.nozzleType.value = state.nozzleType;
+      els.masterStreamType.value =
+      state.masterStreamType;
+
+      els.masterStreamLoss.value =
+      state.masterStreamLoss;
+
+      els.dualLineSupplyToggle.checked =
+      state.dualLineSupply;
       els.smoothboreTip.value = state.smoothboreTip;
       els.applianceLoss.value = state.applianceLoss;
       els.customCoefficient.value = state.customCoefficient;
@@ -2877,18 +2970,28 @@ document.querySelector('label[for="applianceLoss"]').textContent =
 
 } else {
 
-  els.calculatedLabel.textContent = "Calculated";
+  els.calculatedLabel.textContent = isRequiredPdpMode()
+    ? "Total Flow"
+    : "Calculated";
+
   els.totalFlLabel.textContent = "Total FL";
+
   els.flPer100Label.textContent =
-  isSplitLayMode()
-    ? "FL Breakdown"
-    : "FL / 100'";
+    isSplitLayMode()
+      ? "FL Breakdown"
+      : "FL / 100'";
+
   els.nozzleDisplayLabel.textContent = "Nozzle";
-  els.reactionLabel.textContent = "Reaction";
+
+  els.reactionLabel.textContent =
+    isRequiredPdpMode()
+      ? "Supply"
+      : "Reaction";
+
   els.setupLabel.textContent = "Setup";
   els.nozzleReaction.parentElement.style.display = "";
 
-} 
+}
     
       els.nozzleType.closest(".field").style.display =
   isSplitLayMode() ? "none" : "";
@@ -2907,6 +3010,7 @@ els.nozzleTypeLabel.textContent = isRelayMode()
   els.nozzleType.innerHTML = `
     <option value="fog">Fog</option>
     <option value="smoothbore">Smoothbore</option>
+    <option value="masterstream">Master Stream</option>
   `;
   els.nozzleType.value = state.nozzleType;
 }
@@ -2941,15 +3045,54 @@ syncSplitLayUi();
 function syncSmoothboreUi() {
 
   if (isRelayMode() || isSplitLayMode()) {
+
     els.smoothboreTipField.hidden = true;
     els.smoothboreTipField.style.display = "none";
+
+    els.masterStreamTypeField.hidden = true;
+    els.masterStreamTypeField.style.display = "none";
+
+    els.dualLineSupplyField.hidden = true;
+    els.dualLineSupplyField.style.display = "none";
+
     return;
   }
 
-  els.smoothboreTipField.hidden = !isSmoothbore();
-  els.smoothboreTipField.style.display = isSmoothbore() ? "" : "none";
+  const showMasterStream =
+    isMasterStream();
 
-  if (!isSmoothbore()) {
+  els.masterStreamTypeField.hidden =
+    !showMasterStream;
+
+  els.masterStreamTypeField.style.display =
+    showMasterStream ? "" : "none";
+
+    els.masterStreamLossField.hidden =
+  !showMasterStream;
+
+    els.masterStreamLossField.style.display =
+    showMasterStream ? "" : "none";
+
+  const showSmoothbore =
+    isSmoothbore();
+
+  els.smoothboreTipField.hidden =
+    !showSmoothbore;
+
+  els.smoothboreTipField.style.display =
+    showSmoothbore ? "" : "none";
+
+  const showDualLines =
+    isRequiredPdpMode() &&
+    isMasterStream();
+
+  els.dualLineSupplyField.hidden =
+    !showDualLines;
+
+  els.dualLineSupplyField.style.display =
+    showDualLines ? "" : "none";
+
+  if (!showSmoothbore) {
     state.smoothboreTip = "";
     els.smoothboreTip.value = "";
   }
@@ -3385,11 +3528,12 @@ if (!confirmed) return;
   getNozzlePressures()[state.nozzleType][0]
 );
 
-  syncCalculatedSmoothboreTargetFlow();
-  syncSmoothboreUi();
-  syncModeUi();
-  renderPressureButtons();
-  updateCalculator();
+populateSmoothboreTips();
+syncCalculatedSmoothboreTargetFlow();
+syncSmoothboreUi();
+syncModeUi();
+renderPressureButtons();
+updateCalculator();
 });
 
       els.smoothboreTip.addEventListener("change", e => {
@@ -3399,6 +3543,34 @@ if (!confirmed) return;
         renderPressureButtons();
         updateCalculator();
       });
+
+      els.masterStreamType.addEventListener("change", e => {
+  state.masterStreamType = e.target.value;
+
+  state.customNozzlePressure = "";
+  els.customNozzlePressure.value = "";
+
+  state.nozzlePressure = String(
+    getNozzlePressures()[state.nozzleType][0]
+  );
+
+  syncCalculatedSmoothboreTargetFlow();
+  syncSmoothboreUi();
+  syncModeUi();
+  renderPressureButtons();
+  updateCalculator();
+});
+
+els.dualLineSupplyToggle.addEventListener("change", e => {
+  state.dualLineSupply = e.target.checked;
+  updateCalculator();
+});
+
+els.masterStreamLoss.addEventListener("input", e => {
+  state.masterStreamLoss = e.target.value || "25";
+  updateCalculator();
+});
+
       document.querySelectorAll("#splitSectionButtons button").forEach(button => {
   button.addEventListener("click", () => {
     state.splitLay.sectionCount = button.dataset.sections;
@@ -3580,18 +3752,21 @@ document.querySelectorAll("#splitAttackLineButtons button").forEach(button => {
   // ========================================
 
   if (mode === "reverse" || mode === "requiredPdp") {
-    state.pdp = "";
-    state.targetGpm = "";
-    state.hoseLength = "";
-    state.hoseSize = "1.88";
+  state.pdp = "";
+  state.targetGpm = "";
+  state.hoseLength = "";
+  state.hoseSize = "1.88";
 
-    state.nozzleType = "fog";
-    state.nozzlePressure = "55";
+  state.nozzleType = "fog";
+  state.masterStreamType = "fog";
+  state.masterStreamLoss = "25";
+  state.dualLineSupply = false;
 
-    state.smoothboreTip = "";
+  state.nozzlePressure = "55";
+  state.smoothboreTip = "";
 
-    state.applianceLoss = "0";
-  }
+  state.applianceLoss = "0";
+}
 
   populateHoseOptions();
 
@@ -3912,6 +4087,11 @@ calculateReverseFlow({ ...inputs, warnings });
 
       syncCalculatedSmoothboreTargetFlow();
 
+      const masterStreamLoss =
+      isMasterStream()
+    ? numberOrNull(state.masterStreamLoss) ?? 25
+    : 0;
+
       return {
         selectedHose,
         coefficient,
@@ -3920,25 +4100,27 @@ calculateReverseFlow({ ...inputs, warnings });
         hoseLength: numberOrNull(state.hoseLength),
         nozzlePressure,
         applianceLoss: numberOrNull(state.applianceLoss) ?? 0,
+        masterStreamLoss,
       };
     }
 
     // ========================================
     // REVERSE FLOW CALCULATIONS
     // ========================================
-    function calculateReverseFlow({ pdp, hoseLength, nozzlePressure, applianceLoss, coefficient, selectedHose, warnings }) {
-      if (pdp === null || hoseLength === null || nozzlePressure === null || coefficient === null) {
+    function calculateReverseFlow({ pdp, hoseLength, nozzlePressure, applianceLoss, masterStreamLoss, coefficient, selectedHose, warnings }) {      if (pdp === null || hoseLength === null || nozzlePressure === null || coefficient === null) {
         renderWarnings(warnings);
         return;
       }
 
       if (!validateCommonInputs({ hoseLength, coefficient, warnings })) return;
 
-      if (pdp <= nozzlePressure + applianceLoss) {
+      if (pdp <= nozzlePressure + applianceLoss + masterStreamLoss) {
 
   warnings.push(
-    "PDP must exceed nozzle pressure and appliance/elevation loss."
-  );
+  isMasterStream()
+    ? "PDP must exceed nozzle pressure, master stream device loss, and appliance/elevation loss."
+    : "PDP must exceed nozzle pressure and appliance/elevation loss."
+);
 
   setResult(
     "—",
@@ -3955,8 +4137,11 @@ calculateReverseFlow({ ...inputs, warnings });
   return;
 }
 
-      const totalFrictionLoss = pdp - nozzlePressure - applianceLoss;
-
+const totalFrictionLoss =
+  pdp -
+  nozzlePressure -
+  applianceLoss -
+  masterStreamLoss;
       if (totalFrictionLoss < 0) {
         warnings.push("Total friction loss is negative after subtracting nozzle pressure and appliance/elevation loss.");
         setResult("—", "—", `${Math.round(totalFrictionLoss)} psi`, "—", getNozzleDisplay(), getSetupDisplay());
@@ -3994,6 +4179,10 @@ calculateReverseFlow({ ...inputs, warnings });
       const pdp = numberOrNull(state.pdp);
       const hoseLength = numberOrNull(state.hoseLength);
       const applianceLoss = numberOrNull(state.applianceLoss) ?? 0;
+      const masterStreamLoss =
+      isMasterStream()
+      ? numberOrNull(state.masterStreamLoss) ?? 25
+      : 0;
       const selectedHose = getSelectedHose();
       const coefficient = state.useCustomCoefficient
         ? numberOrNull(state.customCoefficient)
@@ -4004,7 +4193,10 @@ calculateReverseFlow({ ...inputs, warnings });
         return null;
       }
 
-      const usablePressure = pdp - applianceLoss;
+      const usablePressure =
+      pdp -
+      applianceLoss -
+      masterStreamLoss;
       if (usablePressure <= 0) return 0;
 
       const lengthHundreds = hoseLength / 100;
@@ -4018,7 +4210,7 @@ calculateReverseFlow({ ...inputs, warnings });
     // ========================================
     // REQUIRED PDP CALCULATIONS
     // ========================================
-    function calculateRequiredPdp({ targetGpm, hoseLength, nozzlePressure, applianceLoss, coefficient, selectedHose, warnings }) {
+    function calculateRequiredPdp({ targetGpm, hoseLength, nozzlePressure, applianceLoss, masterStreamLoss, coefficient, selectedHose, warnings }) {
       if (targetGpm === null || hoseLength === null || nozzlePressure === null || coefficient === null) {
         renderWarnings(warnings);
         return;
@@ -4032,17 +4224,36 @@ calculateReverseFlow({ ...inputs, warnings });
         return;
       }
 
-      const q = targetGpm / 100;
+      const flowForFriction =
+      isRequiredPdpMode() &&
+      isMasterStream() &&
+      state.dualLineSupply
+        ? targetGpm / 2
+        : targetGpm;
+
+      const q = flowForFriction / 100;
       const lengthHundreds = hoseLength / 100;
       const frictionLossPer100 = coefficient * q * q;
       const totalFrictionLoss = frictionLossPer100 * lengthHundreds;
-      const requiredPdp = nozzlePressure + totalFrictionLoss + applianceLoss;
-      const roundedRequiredPdp = Math.round(requiredPdp);
+      const requiredPdp =
+        nozzlePressure +
+        totalFrictionLoss +
+        applianceLoss +
+        masterStreamLoss;      const roundedRequiredPdp = Math.round(requiredPdp);
       const nozzleReaction = calculateNozzleReaction(targetGpm, nozzlePressure);
 
-      if (targetGpm > selectedHose.maxReferenceFlow) {
-        warnings.push(`Target flow is above the normal reference range for ${selectedHose.chartName} hose. Confirm with department-approved flow testing or local operating guidance.`);
-      }
+      const warningFlow =
+  state.dualLineSupply && isMasterStream()
+    ? flowForFriction
+    : targetGpm;
+
+if (warningFlow > selectedHose.maxReferenceFlow) {
+  warnings.push(
+    state.dualLineSupply && isMasterStream()
+      ? `Per-line flow is above the normal reference range for ${selectedHose.chartName} hose. Confirm with department-approved flow testing or local operating guidance.`
+      : `Target flow is above the normal reference range for ${selectedHose.chartName} hose. Confirm with department-approved flow testing or local operating guidance.`
+  );
+}
 
       setResult(
   roundedRequiredPdp,
@@ -4051,7 +4262,10 @@ calculateReverseFlow({ ...inputs, warnings });
   `${frictionLossPer100.toFixed(1)} psi`,
   getNozzleDisplay(),
   getSetupDisplay(),
-  nozzleReaction
+  state.dualLineSupply && isMasterStream()
+    ? `Dual lines: YES
+Per line: ${Math.round(flowForFriction)} GPM`
+    : "Dual lines: NO"
 );
 
       renderWarnings(warnings);
@@ -4949,8 +5163,18 @@ return `Fog @ ${displayPressure} psi`;
 }
 
     function isSmoothbore() {
-      return state.nozzleType === "smoothbore";
-    }
+  return (
+    state.nozzleType === "smoothbore" ||
+    (
+      state.nozzleType === "masterstream" &&
+      state.masterStreamType === "smoothbore"
+    )
+  );
+}
+
+function isMasterStream() {
+  return state.nozzleType === "masterstream";
+}
 
     function isReverseSmoothbore() {
       return isReverseMode() && isSmoothbore();
