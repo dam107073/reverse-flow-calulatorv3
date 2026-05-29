@@ -1927,6 +1927,23 @@ Select a hydraulic calculation mode.
   <div>✓ ALL FUTURE FEATURES</div>
 </div>
 
+<div class="beta-access-section">
+
+  <input
+    type="text"
+    id="betaAccessCode"
+    placeholder="Beta Tester Access Code"
+  />
+
+  <button
+    type="button"
+    id="betaUnlockButton"
+  >
+    Unlock Beta Access
+  </button>
+
+</div>
+
     <div class="pro-modal-footer">
   <strong>One-time purchase.</strong>
   No subscription. Lifetime access to all future PRO features.
@@ -2019,7 +2036,7 @@ const ACCESS_LEVEL_STORAGE_KEY =
 
 let userAccessLevel =
   localStorage.getItem(ACCESS_LEVEL_STORAGE_KEY) ||
-  ACCESS_LEVELS.basic;
+  ACCESS_LEVELS.BASIC;
 
 function isProUser() {
   return (
@@ -2048,6 +2065,39 @@ function enableProAccess() {
 
 function disableProAccess() {
   setAccessLevel(ACCESS_LEVELS.BASIC);
+}
+
+const BETA_ACCESS_CODE = ["RF", "BETA", "2026"].join("-");
+
+function unlockBetaAccess() {
+
+  const enteredCode =
+    document
+      .getElementById("betaAccessCode")
+      .value
+      .trim();
+
+  if (enteredCode === BETA_ACCESS_CODE) {
+
+    setAccessLevel(
+      ACCESS_LEVELS.PRO_COMPED
+    );
+
+    alert(
+      "Beta access unlocked."
+    );
+
+    document
+      .getElementById("proModal")
+      .hidden = true;
+
+  } else {
+
+    alert(
+      "Invalid access code."
+    );
+
+  }
 }
 
 // ========================================
@@ -3460,7 +3510,13 @@ els.splitLayButton.addEventListener("click", () => {
   setMode("splitLay");
   syncSplitLayInputsFromState();
   resetSplitLayResultCard();
+
 });
+
+document
+  .getElementById("betaUnlockButton")
+  ?.addEventListener("click", unlockBetaAccess);
+
 function openProModal() {
   els.proModal.hidden = false;
 }
