@@ -2,7 +2,8 @@
   "dependencies": {
     "@capacitor/android": "^8.3.4",
     "@capacitor/cli": "^8.3.4",
-    "@capacitor/core": "^8.3.4"
+    "@capacitor/core": "^8.3.4",
+    "cordova-plugin-purchase": "^13.16.1"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5"
