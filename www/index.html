@@ -1883,24 +1883,26 @@ Select a hydraulic calculation mode.
 </section>
 
     <section class="card">
-      <details class="about">
-        <summary>About / How to Use</summary>
-        <p><strong>Reverse Flow Mode</strong> Estimates GPM by working backwards using PDP, Nozzle Pressure, and Friction Loss.</p>
-        <p><strong>Required PDP Mode</strong> Calculates the pump discharge pressure needed to achieve a target GPM.</p>
-        <p><strong>Relay Pumping Mode</strong> Calculates the required PDP for a relay pumper to supply a receiving unit with a specific target flow.</p>
-        <p><strong>Split Lay Mode</strong> Models complex split-supply and split-attack hose layouts with dynamic pressure balancing, recalculated nozzle pressures, actual delivered flow, and appliance loss handling.</p>
-        <p>When unequal attack lines are supplied from a common source, lower-demand lines may become overpressured. Reverse Flow dynamically recalculates actual nozzle pressure, flow, friction loss, and nozzle reaction to reflect real-world hydraulic behavior.</p>
-        <p>Smoothbore tip size is selected manually. In Reverse Flow and Split Lay modes, nozzle pressure and actual delivered flow may be dynamically recalculated based on available pressure, hose configuration, and hydraulic demand.</p>
-        <p>
-  Actual pump discharge pressure may vary due to internal plumbing configurations, apparatus piping layouts, valves, devices, and other system-specific restrictions not automatically accounted for by the calculators.
-</p>
+  <details class="about">
+    <summary>About / How to Use</summary>
 
-<p>
-  For the best app-like experience on iPhone, tap Share, then Add to Home Screen. Android users can use Add to Home Screen or Install App when prompted.
-</p>
-        <p>This calculator is intended for training and reference. Always follow local pump charts, equipment testing, department policy, and instructor guidance.</p>
-      </details>
-    </section>
+    <p><strong>Reverse Flow Mode</strong> estimates GPM by working backwards from pump discharge pressure, nozzle pressure, hose length, hose coefficient, and appliance/elevation loss.</p>
+
+    <p><strong>Required PDP Mode</strong> calculates the pump discharge pressure needed to achieve a target flow.</p>
+
+    <p><strong>Relay Pumping Mode</strong> calculates the required discharge pressure for a relay pumper to supply a receiving engine with a target flow and residual pressure.</p>
+
+    <p><strong>Split Lay Mode</strong> models split-supply and split-attack hose layouts with dynamic pressure balancing, recalculated nozzle pressures, delivered flow, and appliance loss handling.</p>
+
+    <p>When unequal attack lines are supplied from a common source, lower-demand lines may become overpressured. Reverse Flow dynamically recalculates nozzle pressure, flow, friction loss, and nozzle reaction to better reflect real-world hydraulic behavior.</p>
+
+    <p>Smoothbore tip size is selected manually. In Reverse Flow and Split Lay modes, nozzle pressure and delivered flow may be dynamically recalculated based on available pressure, hose configuration, and hydraulic demand.</p>
+
+    <p>Actual pump discharge pressure may vary due to internal plumbing, apparatus piping, valves, appliances, intake restrictions, and other system-specific factors not automatically accounted for by the calculators.</p>
+
+    <p>This application is intended for training, reference, and operational decision support. Always follow local pump charts, equipment testing, department policy, and instructor guidance.</p>
+  </details>
+</section>
 
     <div id="proModal" class="pro-modal" hidden>
   <div class="pro-modal-content">
@@ -1932,14 +1934,14 @@ Select a hydraulic calculation mode.
   <input
     type="text"
     id="betaAccessCode"
-    placeholder="Beta Tester Access Code"
+    placeholder="Tester Access Code"
   />
 
   <button
     type="button"
     id="betaUnlockButton"
   >
-    Unlock Beta Access
+    Unlock Tester Access
   </button>
 
 </div>
@@ -2013,8 +2015,8 @@ Select a hydraulic calculation mode.
 // APP CONFIG
 // ========================================
 
-const APP_VERSION = "3.7.5-pro-beta!";
-    const BUILD_DATE = "2026-05-28";
+const APP_VERSION = "1.0";
+    const BUILD_DATE = "2026-05-30";
 
 const STORAGE_KEY = "reverse-flow-calculator-v3";
 const PRESETS_KEY = "reverse-flow-calculator-presets-v1";
@@ -2084,7 +2086,7 @@ function unlockBetaAccess() {
     );
 
     alert(
-      "Beta access unlocked."
+      "Tester access unlocked."
     );
 
     document
@@ -2451,9 +2453,9 @@ relayResidualPressure: document.getElementById("relayResidualPressure"),
     function init() {
 
   els.versionFooter.textContent =
-  `Reverse Flow Calculator v${APP_VERSION} • ${BUILD_DATE}`;
+  `Reverse Flow v${APP_VERSION}`;
+  
   updateAccessBadge();
-
   populateHoseOptions();
   populateSmoothboreTips();
   renderPresetOptions();
@@ -2477,7 +2479,7 @@ function updateAccessBadge() {
   if (!badge) return;
 
   if (userAccessLevel === ACCESS_LEVELS.PRO_COMPED) {
-    badge.textContent = "PRO BETA ACCESS";
+    badge.textContent = "PRO";
     return;
   }
 
@@ -2486,9 +2488,8 @@ function updateAccessBadge() {
     return;
   }
 
-  badge.textContent = "BASIC VERSION";
+  badge.textContent = "BASIC";
 }
-
     // ========================================
     // STORAGE
     // ========================================
